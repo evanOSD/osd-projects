@@ -10,33 +10,30 @@ import type { SystemMode } from '@core/types'
 // Config Imports
 import themeConfig from '@configs/themeConfig'
 
-// 1. Tambahkan async dan await pada cookies()
+// 1. Tambahkan async dan await
 export const getSettingsFromCookie = async (): Promise<Settings> => {
-  const cookieStore = await cookies() // <--- Kunci perbaikannya di sini
+  const cookieStore = await cookies() // <--- NEXT.JS 15 WAJIB AWAIT
 
   const cookieName = themeConfig.settingsCookieName
+  const cookieValue = cookieStore.get(cookieName)?.value
 
-  return JSON.parse(cookieStore.get(cookieName)?.value || '{}')
+  return JSON.parse(cookieValue || '{}')
 }
 
-// 2. Karena fungsi di atas jadi async, fungsi pemanggilnya juga wajib async
-export const getMode = async () => {
+// 2. Karena pemanggilnya async, fungsi ini juga wajib async
+export const getMode = async (): Promise<SystemMode> => {
   const settingsCookie = await getSettingsFromCookie()
 
-  // Get mode from cookie or fallback to theme config
-  const _mode = settingsCookie.mode || themeConfig.mode
+  // Ambil mode dari cookie atau gunakan fallback dari themeConfig
+  const _mode = (settingsCookie.mode || themeConfig.mode) as SystemMode
 
   return _mode
 }
 
 export const getSystemMode = async (): Promise<SystemMode> => {
-  const mode = await getMode()
-
-  return mode
+  return await getMode()
 }
 
-export const getServerMode = async () => {
-  const mode = await getMode()
-
-  return mode
+export const getServerMode = async (): Promise<SystemMode> => {
+  return await getMode()
 }
