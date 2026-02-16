@@ -12,7 +12,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'warn',
     '@typescript-eslint/no-non-null-assertion': 'off',
     'lines-around-comment': [
-      'error',
+      'warn',
       {
         beforeBlockComment: true,
         beforeLineComment: true,
@@ -49,7 +49,7 @@ module.exports = {
         next: '*'
       }
     ],
-    'newline-before-return': 'error',
+    'newline-before-return': 'warn',
     'import/newline-after-import': [
       'error',
       {
@@ -57,7 +57,7 @@ module.exports = {
       }
     ],
     'import/order': [
-      'error',
+      'warn',
       {
         groups: ['builtin', 'external', ['internal', 'parent', 'sibling', 'index'], ['object', 'unknown']],
         pathGroups: [

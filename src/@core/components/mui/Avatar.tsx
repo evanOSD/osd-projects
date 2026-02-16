@@ -1,3 +1,5 @@
+// src/@core/components/mui/Avatar.tsx
+
 'use client'
 
 // React Imports

@@ -1,77 +1,88 @@
 'use client'
 
-// React Imports
-import { useRef } from 'react'
+import { useTheme } from '@mui/material/styles'
 
-// Next Imports
-import Link from 'next/link'
-
-// MUI Imports
-import { styled, useTheme } from '@mui/material/styles'
-
-// Component Imports
 import VerticalNav, { NavHeader } from '@menu/vertical-menu'
 import VerticalMenu from './VerticalMenu'
 import Logo from '@components/layout/shared/Logo'
 
-// Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
-
-// Style Imports
+import { useSettings } from '@core/hooks/useSettings'
 import navigationCustomStyles from '@core/styles/vertical/navigationCustomStyles'
 
-const StyledBoxForShadow = styled('div')(({ theme }) => ({
-  top: 60,
-  left: -8,
-  zIndex: 2,
-  opacity: 0,
-  position: 'absolute',
-  pointerEvents: 'none',
-  width: 'calc(100% + 15px)',
-  height: theme.mixins.toolbar.minHeight,
-  transition: 'opacity .15s ease-in-out',
-  background: `linear-gradient(var(--mui-palette-background-default) 5%, rgb(var(--mui-palette-background-defaultChannel) / 0.85) 30%, rgb(var(--mui-palette-background-defaultChannel) / 0.5) 65%, rgb(var(--mui-palette-background-defaultChannel) / 0.3) 75%, transparent)`,
-  '&.scrolled': {
-    opacity: 1
-  }
-}))
-
 const Navigation = () => {
-  // Hooks
   const theme = useTheme()
   const { isBreakpointReached, toggleVerticalNav } = useVerticalNav()
+  const { settings, updateSettings } = useSettings()
 
-  // Refs
-  const shadowRef = useRef(null)
+  const isCollapsed = settings.navCollapsed ?? false
 
-  const scrollMenu = (container: any, isPerfectScrollbar: boolean) => {
-    container = isBreakpointReached || !isPerfectScrollbar ? container.target : container
-
-    if (shadowRef && container.scrollTop > 0) {
-      // @ts-ignore
-      if (!shadowRef.current.classList.contains('scrolled')) {
-        // @ts-ignore
-        shadowRef.current.classList.add('scrolled')
+  const customStyles = {
+    ...navigationCustomStyles(theme),
+    ...(isCollapsed && !isBreakpointReached && {
+      '& .ts-menu-label, & .ts-menu-suffix, & .ts-submenu-expand-icon': { 
+        display: 'none !important' 
+      },
+      '& .ts-menu-button': {
+        paddingLeft: '0 !important',
+        paddingRight: '0 !important',
+        justifyContent: 'center !important',
+      },
+      '& .ts-menu-icon': {
+        marginRight: '0 !important',
+        marginInlineEnd: '0 !important',
+      },
+      '& .app-logo-text': {
+        display: 'none !important'
+      },
+      '& .ts-menu-toggle-icon': {
+        display: 'none !important'
+      },
+      '& .ts-nav-header': {
+        paddingLeft: '0 !important',
+        paddingRight: '0 !important',
+        justifyContent: 'center !important'
       }
-    } else {
-      // @ts-ignore
-      shadowRef.current.classList.remove('scrolled')
-    }
+    })
   }
 
   return (
-    // eslint-disable-next-line lines-around-comment
-    // Sidebar Vertical Menu
-    <VerticalNav customStyles={navigationCustomStyles(theme)}>
-      {/* Nav Header including Logo & nav toggle icons  */}
+    <VerticalNav 
+      customStyles={customStyles} 
+      width={isCollapsed && !isBreakpointReached ? 80 : 260}
+    >
       <NavHeader>
-        <Link href='/'>
-          <Logo />
-        </Link>
-        {isBreakpointReached && <i className='ri-close-line text-xl' onClick={() => toggleVerticalNav(false)} />}
+        <div className="flex items-center justify-between w-full">
+          {/* Komponen <Link> DIHAPUS. Sekarang hanya tag <div> murni dengan onClick event. */}
+          <div 
+            className='cursor-pointer flex items-center select-none'
+            onClick={() => {
+              if (!isBreakpointReached) {
+                // Di Desktop: Klik area logo akan toggle (buka/tutup) sidebar
+                updateSettings({ navCollapsed: !isCollapsed })
+              }
+            }}
+          >
+            <Logo />
+          </div>
+
+          {!isBreakpointReached && (
+            <i 
+              className='ri-menu-line text-xl cursor-pointer text-textPrimary ts-menu-toggle-icon' 
+              onClick={() => updateSettings({ navCollapsed: true })} 
+            />
+          )}
+
+          {isBreakpointReached && (
+            <i 
+              className='ri-close-line text-xl cursor-pointer text-textPrimary' 
+              onClick={() => toggleVerticalNav(false)} 
+            />
+          )}
+        </div>
       </NavHeader>
-      <StyledBoxForShadow ref={shadowRef} />
-      <VerticalMenu scrollMenu={scrollMenu} />
+      
+      <VerticalMenu />
     </VerticalNav>
   )
 }

@@ -20,15 +20,19 @@ export type Config = {
   layoutPadding: number
   compactContentWidth: number
   disableRipple: boolean
+  navCollapsed: boolean      // Untuk Sidebar
+  contentWidth: 'compact' | 'wide' // Untuk Lebar Konten
 }
 
 const themeConfig: Config = {
-  templateName: 'Materio',
+  templateName: 'OSD Projects',
   settingsCookieName: 'materio-mui-next-free-demo',
   mode: 'light', // 'light', 'dark'
   layoutPadding: 24, // Common padding for header, content, footer layout components (in px)
   compactContentWidth: 1440, // in px
-  disableRipple: false // true, false
+  disableRipple: false, // true, false
+  navCollapsed: false,       // Default terbuka
+  contentWidth: 'wide'       // Langsung set ke Wide sesuai permintaan Anda
 }
 
 export default themeConfig

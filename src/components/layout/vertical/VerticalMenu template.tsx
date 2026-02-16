@@ -62,9 +62,8 @@ const VerticalMenu = ({ scrollMenu }: { scrollMenu: (container: any, isPerfectSc
         menuSectionStyles={menuSectionStyles(theme)}
       >
         <SubMenu
-          label='Dashboards'
+          label='Admin'
           icon={<i className='ri-home-smile-line' />}
-          suffix={<Chip label='5' size='small' color='error' />}
         >
           <MenuItem
             href={`${process.env.NEXT_PUBLIC_PRO_URL}/dashboards/crm`}

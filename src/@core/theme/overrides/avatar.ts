@@ -1,3 +1,5 @@
+// src/@core/theme/overrides/avatar.ts
+
 // MUI Imports
 import type { Theme } from '@mui/material/styles'
 

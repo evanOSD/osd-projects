@@ -111,3 +111,63 @@ code {
   background-color: rgb(var(--mui-palette-info-mainChannel) / 0.08);
   border: 0;
 }
+
+
+/* =========================================
+   CUSTOM NATIVE SCROLLBAR 
+   (Meniru tampilan PerfectScrollbar tapi dengan native speed)
+   ========================================= */
+
+/* Mengatur ukuran ketebalan */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Membunuh tombol panah atas/bawah yang norak */
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Background jalur transparan */
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Warna batang scroll mengikuti tema bawaan Materio */
+::-webkit-scrollbar-thumb {
+  background-color: var(--mui-palette-divider);
+  border-radius: 10px;
+}
+
+/* Warna saat mouse di-hover (sedikit lebih gelap/terang menyesuaikan tema) */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--mui-palette-action-disabled);
+}
+
+/* Standar baru untuk Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mui-palette-divider) transparent;
+}
+
+/* =========================================
+   FORCE WIDE MODE (FULL WIDTH CONTENT)
+   Membongkar batas 1440px bawaan template
+   ========================================= */
+
+/* Paksa area konten utama untuk membentang 100% */
+.ts-vertical-layout-content,
+.ts-vertical-layout-content-wrapper > main,
+main[class*='layout-content'] {
+  max-width: 100% !important;
+  width: 100% !important;
+  max-inline-size: 100% !important; /* Untuk mengatasi Styled Component Materio */
+}
+
+/* Pastikan header dan footer juga tidak tertahan */
+.ts-vertical-layout-header .ts-vertical-layout-navbar,
+.ts-vertical-layout-footer {
+  max-width: 100% !important;
+  max-inline-size: 100% !important;
+}

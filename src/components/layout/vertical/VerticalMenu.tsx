@@ -2,9 +2,6 @@
 import Chip from '@mui/material/Chip'
 import { useTheme } from '@mui/material/styles'
 
-// Third-party Imports
-import PerfectScrollbar from 'react-perfect-scrollbar'
-
 // Type Imports
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
@@ -32,47 +29,26 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
   </StyledVerticalNavExpandIcon>
 )
 
-const VerticalMenu = ({ scrollMenu }: { scrollMenu: (container: any, isPerfectScrollbar: boolean) => void }) => {
+const VerticalMenu = () => {
   // Hooks
   const theme = useTheme()
-  const { isBreakpointReached, transitionDuration } = useVerticalNav()
-
-  const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
+  const { transitionDuration } = useVerticalNav()
 
   return (
-    // eslint-disable-next-line lines-around-comment
-    /* Custom scrollbar instead of browser scroll, remove if you want browser scroll only */
-    <ScrollWrapper
-      {...(isBreakpointReached
-        ? {
-            className: 'bs-full overflow-y-auto overflow-x-hidden',
-            onScroll: container => scrollMenu(container, false)
-          }
-        : {
-            options: { wheelPropagation: false, suppressScrollX: true },
-            onScrollY: container => scrollMenu(container, true)
-          })}
-    >
-      {/* Incase you also want to scroll NavHeader to scroll with Vertical Menu, remove NavHeader from above and paste it below this comment */}
-      {/* Vertical Menu */}
+
+    // Menggunakan browser scroll agar smooth di macOS
+    <div className='bs-full overflow-y-auto overflow-x-hidden' style={{ WebkitOverflowScrolling: 'touch' }}>
+      <MenuSection label='Custom Pages'></MenuSection>
       <Menu
         menuItemStyles={menuItemStyles(theme)}
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
         renderExpandedMenuItemIcon={{ icon: <i className='ri-circle-line' /> }}
         menuSectionStyles={menuSectionStyles(theme)}
       >
-        <SubMenu
-          label='Dashboards'
-          icon={<i className='ri-home-smile-line' />}
-          suffix={<Chip label='5' size='small' color='error' />}
-        >
-          <MenuItem
-            href={`${process.env.NEXT_PUBLIC_PRO_URL}/dashboards/crm`}
-            suffix={<Chip label='Pro' size='small' color='primary' variant='tonal' />}
-            target='_blank'
-          >
-            CRM
-          </MenuItem>
+        <MenuItem href='/lookup' icon={<img src='images/icons/lookup.svg' alt='Admin Icon' width={20} height={20} />}>
+          Lookup
+        </MenuItem>
+        <SubMenu label='Dashboard' icon={<i className='ri-home-smile-line' />}>
           <MenuItem href='/'>Analytics</MenuItem>
           <MenuItem
             href={`${process.env.NEXT_PUBLIC_PRO_URL}/dashboards/ecommerce`}
@@ -282,7 +258,7 @@ const VerticalMenu = ({ scrollMenu }: { scrollMenu: (container: any, isPerfectSc
           </SubMenu>
         </MenuSection>
       </Menu>
-    </ScrollWrapper>
+    </div>
   )
 }
 

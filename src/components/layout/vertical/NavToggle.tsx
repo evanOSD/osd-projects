@@ -1,23 +1,21 @@
 'use client'
 
-// Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
+import { useSettings } from '@core/hooks/useSettings'
 
 const NavToggle = () => {
-  // Hooks
   const { toggleVerticalNav, isBreakpointReached } = useVerticalNav()
+  const { settings, updateSettings } = useSettings()
 
   const handleClick = () => {
-    toggleVerticalNav()
+    if (isBreakpointReached) {
+      toggleVerticalNav()
+    } else {
+      updateSettings({ navCollapsed: !settings.navCollapsed })
+    }
   }
 
-  return (
-    <>
-      {/* <i className='ri-menu-line text-xl cursor-pointer' onClick={handleClick} /> */}
-      {/* Comment following code and uncomment above code in order to toggle menu on desktop screens as well */}
-      {isBreakpointReached && <i className='ri-menu-line text-xl cursor-pointer' onClick={handleClick} />}
-    </>
-  )
+  return <i className='ri-menu-line text-xl cursor-pointer text-textPrimary' onClick={handleClick} />
 }
 
 export default NavToggle

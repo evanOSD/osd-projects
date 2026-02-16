@@ -6,9 +6,6 @@ import type { CSSProperties } from 'react'
 // Third-party Imports
 import styled from '@emotion/styled'
 
-// Component Imports
-import MaterioLogo from '@core/svg/Logo'
-
 // Config Imports
 import themeConfig from '@configs/themeConfig'
 
@@ -22,15 +19,24 @@ const LogoText = styled.span<LogoTextProps>`
   line-height: 1.2;
   font-weight: 600;
   letter-spacing: 0.15px;
-  text-transform: uppercase;
   margin-inline-start: 10px;
+  /* text-transform: uppercase; <-- SUDAH DIHAPUS AGAR NORMAL CASE */
 `
 
 const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
   return (
     <div className='flex items-center min-bs-[24px]'>
-      <MaterioLogo className='text-[22px] text-primary' />
-      <LogoText color={color}>{themeConfig.templateName}</LogoText>
+      {/* 1. Ganti Logo M bawaan menjadi logo SVG Anda sendiri */}
+      <img 
+        src='/images/logos/osd-logo.svg' 
+        alt='OSD Logo' 
+        width={40} 
+        height={40} 
+      />
+      {/* 2. Teks mengambil dari themeConfig ('OSD Projects') dan saya tambahkan class agar bisa disembunyikan saat collapsed */}
+      <LogoText color={color} className='app-logo-text'>
+        {themeConfig.templateName}
+      </LogoText>
     </div>
   )
 }
