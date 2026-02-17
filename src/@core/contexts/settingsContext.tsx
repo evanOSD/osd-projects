@@ -1,3 +1,5 @@
+// src/@core/context/settingsContext.tsx
+
 'use client'
 
 import type { ReactNode } from 'react'

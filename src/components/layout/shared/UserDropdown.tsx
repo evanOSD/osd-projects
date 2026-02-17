@@ -4,8 +4,11 @@
 import { useRef, useState, useEffect } from 'react'
 import type { MouseEvent } from 'react'
 
-// Next Imports
 import { useRouter } from 'next/navigation'
+
+import type { Route } from 'next'
+
+// Next Imports
 
 // MUI Imports
 import { styled } from '@mui/material/styles'
@@ -95,7 +98,8 @@ const UserDropdown = () => {
 
   const handleDropdownClose = (event?: MouseEvent<HTMLLIElement> | (MouseEvent | TouchEvent), url?: string) => {
     if (url) {
-      router.push(url)
+      // Cast string menjadi tipe Route bawaan Next.js
+      router.push(url as Route)
     }
 
     if (anchorRef.current && anchorRef.current.contains(event?.target as HTMLElement)) {

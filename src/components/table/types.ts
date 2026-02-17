@@ -16,6 +16,6 @@ export type TableProps = {
   onDeleteBatch: (ids: string[]) => void
   sortConfig?: { column: string; ascending: boolean } | null
   onSortChange?: (column: string, ascending: boolean) => void
-  filters?: Record<string, string>
-  onFilterChange?: (column: string, value: string) => void
+  filters?: Record<string, string | string[]> 
+  onFilterChange?: (column: string, value: string | string[]) => void
 }

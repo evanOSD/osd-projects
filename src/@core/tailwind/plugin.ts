@@ -1,3 +1,5 @@
+// src/@core/tailwind/plugin.ts
+
 import plugin from 'tailwindcss/plugin'
 
 module.exports = plugin(function () {}, {

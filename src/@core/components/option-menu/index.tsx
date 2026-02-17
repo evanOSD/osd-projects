@@ -1,3 +1,6 @@
+// src/@core/components/option-menu/index.tsx
+
+
 'use client'
 
 // React Imports
@@ -109,9 +112,10 @@ const OptionMenu = (props: OptionsMenuType) => {
                           {...(option.href && { className: 'p-0' })}
                           onClick={e => {
                             handleClose(e)
-                            option.menuItemProps && option.menuItemProps.onClick
-                              ? option.menuItemProps.onClick(e)
-                              : null
+
+                            if (option.menuItemProps?.onClick) {
+                              option.menuItemProps.onClick(e as any)
+                            }
                           }}
                         >
                           <MenuItemWrapper option={option}>

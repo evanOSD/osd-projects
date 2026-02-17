@@ -174,32 +174,31 @@ const Table = ({
                     }}
                   >
                     <div className='flex items-center gap-2'>
-                      
                       {/* 1. TOMBOL SORT (KIRI & SELALU MUNCUL) */}
                       <IconButton
-                        size="small"
+                        size='small'
                         onClick={() => handleSortClick(col)}
                         color={isSortActive ? 'primary' : 'default'}
                         sx={{ padding: '4px' }}
                       >
-                        <i 
+                        <i
                           className={`text-base ${
-                            isSortActive 
-                              ? (sortConfig.ascending ? 'ri-arrow-up-line' : 'ri-arrow-down-line') 
+                            isSortActive
+                              ? sortConfig.ascending
+                                ? 'ri-arrow-up-line'
+                                : 'ri-arrow-down-line'
                               : 'ri-arrow-up-down-line text-gray-400 opacity-50'
-                          }`} 
+                          }`}
                         />
                       </IconButton>
 
                       {/* 2. TEKS HEADER (TENGAH & BISA DI-SELECT/COPY) */}
-                      <span className="flex-grow select-text cursor-text">
+                      <span className='flex-grow select-text cursor-text'>
                         {col.replace(/_/g, ' ')}
                         {requiredColumns.includes(col) && (
                           <span style={{ color: theme.palette.error.main, marginLeft: '4px' }}>*</span>
                         )}
-                        {LOCKED_COLUMNS.includes(col) && (
-                          <i className='ml-1 text-xs ri-lock-line text-textDisabled' />
-                        )}
+                        {LOCKED_COLUMNS.includes(col) && <i className='ml-1 text-xs ri-lock-line text-textDisabled' />}
                       </span>
 
                       {/* 3. TOMBOL FILTER (KANAN) */}
@@ -208,8 +207,9 @@ const Table = ({
                         options={columnOptions[col]}
                         currentFilterValue={filters[col] || ''}
                         onApply={(c, v) => onFilterChange && onFilterChange(c, v)}
+                        tableData={data}
+                        sortConfig={sortConfig} // ✅ TAMBAHKAN BARIS INI
                       />
-                      
                     </div>
                   </TableCell>
                 )

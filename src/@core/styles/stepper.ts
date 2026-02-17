@@ -1,3 +1,5 @@
+// src/@core/styles/stepper.ts
+
 // MUI imports
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'

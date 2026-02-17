@@ -1,3 +1,5 @@
+// src/@core/components/option-menu/types.tsx
+
 // React Imports
 import type { ReactNode } from 'react'
 
@@ -24,7 +26,7 @@ export type OptionMenuItemType = {
   text: ReactNode
   icon?: ReactNode
   linkProps?: BoxProps
-  href?: LinkProps['href']
+  href?: LinkProps<string>['href']
   menuItemProps?: MenuItemProps
   divider?: never
   dividerProps?: never

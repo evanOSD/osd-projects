@@ -1,3 +1,5 @@
+// src/@core/styles/vertical/navigationSectionStyles.ts
+
 // MUI Imports
 import type { Theme } from '@mui/material/styles'
 

@@ -1,3 +1,5 @@
+// src/@core/styles/vertical/menuItemStyles.ts
+
 // MUI Imports
 import { lighten } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'

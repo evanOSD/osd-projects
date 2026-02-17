@@ -18,7 +18,7 @@ export const useSupabaseTable = (
 
   // Gunakan defaultSort sebagai state awal saat pertama kali dirender
   const [sortConfig, setSortConfig] = useState<{ column: string; ascending: boolean } | null>(defaultSort)
-  const [filters, setFilters] = useState<Record<string, string>>({})
+  const [filters, setFilters] = useState<Record<string, string | string[]>>({})
 
   const fetchTableData = useCallback(async () => {
     setIsLoading(true)
@@ -28,7 +28,15 @@ export const useSupabaseTable = (
 
     // 1. Terapkan Filter
     Object.entries(filters).forEach(([col, val]) => {
-      if (val) query = query.ilike(col, `%${val}%`)
+      if (Array.isArray(val)) {
+        // Jika val adalah array (multiple selection), gunakan .in()
+        if (val.length > 0) {
+          query = query.in(col, val)
+        }
+      } else if (val) {
+        // Fallback jika val adalah string (jika masih ada filter teks lama)
+        query = query.ilike(col, `%${val}%`)
+      }
     })
 
     // 2. Terapkan Sorting (Karena state awal adalah defaultSort, logika ini akan langsung jalan)
@@ -73,7 +81,7 @@ export const useSupabaseTable = (
       Object.keys(cleanedRecord).forEach(key => {
         if (cleanedRecord[key] === '') cleanedRecord[key] = null
       })
-      
+
       return cleanedRecord
     })
 
@@ -105,7 +113,7 @@ export const useSupabaseTable = (
     setSortConfig({ column, ascending })
   }
 
-  const handleFilterChange = (column: string, value: string) => {
+  const handleFilterChange = (column: string, value: string | string[]) => {
     setFilters(prev => ({ ...prev, [column]: value }))
   }
 

@@ -1,3 +1,5 @@
+// src/@core/hooks/useImageVariant.tsx
+
 // React Imports
 import { useMemo } from 'react'
 

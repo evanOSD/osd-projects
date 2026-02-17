@@ -1,7 +1,6 @@
 {
-  "name": "next-app-test",
+  "name": "osdproject",
   "version": "0.1.0",
-  "license": "Commercial",
   "private": true,
   "scripts": {
     "dev": "next dev",
