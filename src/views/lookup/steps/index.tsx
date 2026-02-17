@@ -4,7 +4,12 @@
 import SupabaseTableRenderer from '@/components/table/SupabaseTableRenderer'
 
 const StepsTab = () => {
-  return <SupabaseTableRenderer tableName='steps' />
+  return (
+    <SupabaseTableRenderer 
+      tableName='books' 
+      defaultSort={{ column: 'default_order', ascending: true }} 
+    />
+  )
 }
 
 export default StepsTab
