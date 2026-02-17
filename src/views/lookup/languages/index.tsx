@@ -6,7 +6,7 @@ import SupabaseTableRenderer from '@/components/table/SupabaseTableRenderer'
 const LanguagesTab = () => {
   return (
     <SupabaseTableRenderer 
-      tableName='books' 
+      tableName='languages' 
       defaultSort={{ column: 'global_order', ascending: true }} 
     />
   )

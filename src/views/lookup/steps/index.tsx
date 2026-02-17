@@ -6,7 +6,7 @@ import SupabaseTableRenderer from '@/components/table/SupabaseTableRenderer'
 const StepsTab = () => {
   return (
     <SupabaseTableRenderer 
-      tableName='books' 
+      tableName='steps' 
       defaultSort={{ column: 'default_order', ascending: true }} 
     />
   )

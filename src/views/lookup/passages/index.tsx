@@ -6,7 +6,7 @@ import SupabaseTableRenderer from '@/components/table/SupabaseTableRenderer'
 const PassagesTab = () => {
   return (
     <SupabaseTableRenderer 
-      tableName='books' 
+      tableName='passages' 
       defaultSort={{ column: 'name_with_code', ascending: true }} 
     />
   )
