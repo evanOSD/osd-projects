@@ -1,3 +1,5 @@
+// src/app/(dashboard)/page.tsx
+
 // MUI Imports
 import Grid from '@mui/material/Grid'
 

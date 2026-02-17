@@ -1,3 +1,4 @@
+// src/app/(dashboard)/layout.tsx
 
 import Toaster from '@/components/layout/shared/Toaster'
 
