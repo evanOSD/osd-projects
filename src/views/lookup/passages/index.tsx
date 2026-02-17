@@ -7,7 +7,7 @@ const PassagesTab = () => {
   return (
     <SupabaseTableRenderer 
       tableName='passages' 
-      defaultSort={{ column: 'name_with_code', ascending: true }} 
+      defaultSort={{ column: 'global_order', ascending: true }} 
     />
   )
 }

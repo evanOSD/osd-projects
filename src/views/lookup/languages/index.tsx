@@ -7,7 +7,7 @@ const LanguagesTab = () => {
   return (
     <SupabaseTableRenderer 
       tableName='languages' 
-      defaultSort={{ column: 'global_order', ascending: true }} 
+      defaultSort={{ column: 'name_with_code', ascending: true }} 
     />
   )
 }
