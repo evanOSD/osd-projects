@@ -1,6 +1,6 @@
-// src/components/table/TableToolbar.tsx
-
 'use client'
+
+import { useState } from 'react'
 
 // MUI Imports
 import Toolbar from '@mui/material/Toolbar'
@@ -9,8 +9,12 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
-import { alpha, useTheme } from '@mui/material/styles'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Checkbox from '@mui/material/Checkbox'
+import ListItemText from '@mui/material/ListItemText'
 import InputAdornment from '@mui/material/InputAdornment'
+import { alpha, useTheme } from '@mui/material/styles'
 
 type TableToolbarProps = {
   tableName: string
@@ -22,6 +26,16 @@ type TableToolbarProps = {
   onAddRow: () => void
   globalFilter: string
   setGlobalFilter: (val: string) => void
+  
+  // Props untuk Show/Hide Columns
+  columns: string[]
+  hiddenColumns: string[]
+  onToggleColumn: (column: string) => void
+}
+
+// Helper untuk format label kolom di Menu (misal: "user_name" -> "User Name")
+const formatLabel = (str: string) => {
+  return str.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 const TableToolbar = (props: TableToolbarProps) => {
@@ -34,18 +48,31 @@ const TableToolbar = (props: TableToolbarProps) => {
     onDeleteSelected,
     onAddRow,
     globalFilter,
-    setGlobalFilter
+    setGlobalFilter,
+    columns,
+    hiddenColumns,
+    onToggleColumn
   } = props
 
   const theme = useTheme()
+
+  // --- STATE MENU KOLOM ---
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const openMenu = Boolean(anchorEl)
+
+  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
 
   return (
     <Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        
-        // Jika ada baris yang dipilih, ubah warna background toolbar
         ...(selectedCount > 0 && {
           bgcolor: alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity)
         }),
@@ -68,7 +95,6 @@ const TableToolbar = (props: TableToolbarProps) => {
           </Typography>
         )}
 
-        {/* Tombol Hapus Muncul saat ada yang dipilih */}
         {selectedCount > 0 && (
           <Tooltip title='Hapus yang dipilih'>
             <IconButton onClick={onDeleteSelected} color='error'>
@@ -78,9 +104,9 @@ const TableToolbar = (props: TableToolbarProps) => {
         )}
       </div>
 
-      {/* BAGIAN KANAN: Search & Action Buttons */}
+      {/* BAGIAN KANAN: Actions */}
       <div className='flex items-center gap-3'>
-        {/* Kotak Pencarian */}
+        {/* 1. INPUT PENCARIAN */}
         <TextField
           size='small'
           placeholder='Cari data...'
@@ -96,14 +122,53 @@ const TableToolbar = (props: TableToolbarProps) => {
           }}
         />
 
-        {/* Tombol Batal (Muncul jika ada ketikan) */}
+        {/* 2. TOMBOL COLUMNS (Toggle Show/Hide) */}
+        <Button 
+          variant='outlined' 
+          color='secondary' 
+          onClick={handleOpenMenu}
+          startIcon={<i className='ri-layout-column-line' />}
+        >
+          Columns
+        </Button>
+
+        {/* DROPDOWN MENU PILIH KOLOM */}
+        <Menu
+          anchorEl={anchorEl}
+          open={openMenu}
+          onClose={handleCloseMenu}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          slotProps={{ 
+            paper: { 
+              style: { 
+                maxHeight: 300, // Batasi tinggi menu agar bisa di-scroll jika kolom banyak
+                width: 250      // Lebar menu yang pas
+              } 
+            } 
+          }}
+        >
+          {columns.map((col) => {
+            // Kolom ditampilkan jika TIDAK ada di dalam array hiddenColumns
+            const isVisible = !hiddenColumns.includes(col)
+            
+            return (
+              <MenuItem key={col} onClick={() => onToggleColumn(col)}>
+                <Checkbox checked={isVisible} size="small" />
+                <ListItemText primary={formatLabel(col)} />
+              </MenuItem>
+            )
+          })}
+        </Menu>
+
+        {/* 3. TOMBOL BATAL (Muncul saat edit) */}
         {hasUnsavedChanges && (
           <Button variant='outlined' color='secondary' onClick={onDiscard} startIcon={<i className='ri-close-line' />}>
             Batal
           </Button>
         )}
 
-        {/* Tombol Simpan (Selalu ada, tapi nyala/mati tergantung ketikan) */}
+        {/* 4. TOMBOL SIMPAN */}
         <Button
           variant='contained'
           color='success'
@@ -114,7 +179,7 @@ const TableToolbar = (props: TableToolbarProps) => {
           Save
         </Button>
 
-        {/* Tombol Tambah Baris */}
+        {/* 5. TOMBOL TAMBAH */}
         <Button variant='outlined' onClick={onAddRow} startIcon={<i className='ri-add-line' />}>
           Add
         </Button>

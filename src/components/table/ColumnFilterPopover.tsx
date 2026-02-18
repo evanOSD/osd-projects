@@ -10,6 +10,7 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete'
 import Checkbox from '@mui/material/Checkbox'
+import { alpha, useTheme } from '@mui/material/styles' // 1. Import Theme Utils
 
 type ColumnFilterPopoverProps = {
   col: string
@@ -17,8 +18,6 @@ type ColumnFilterPopoverProps = {
   currentFilterValue: string | string[]
   onApply: (col: string, val: string[]) => void
   tableData: any[]
-
-  // ✅ PROP BARU: Menerima konfigurasi urutan yang sedang aktif dari tabel
   sortConfig?: { column: string; ascending: boolean } | null
 }
 
@@ -39,8 +38,9 @@ const ColumnFilterPopover = ({
   currentFilterValue, 
   onApply, 
   tableData,
-  sortConfig // <--- Ambil prop baru ini
+  sortConfig 
 }: ColumnFilterPopoverProps) => {
+  const theme = useTheme() // 2. Init Theme
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
   const initialValue = Array.isArray(currentFilterValue) 
@@ -48,17 +48,16 @@ const ColumnFilterPopover = ({
     : (currentFilterValue ? [currentFilterValue] : [])
     
   const [tempValue, setTempValue] = useState<string[]>(initialValue)
+  
+  // 3. State baru untuk menahan teks pencarian agar tidak hilang
+  const [inputValue, setInputValue] = useState('') 
 
-  // --- LOGIKA MENGURUTKAN NILAI UNIK BERDASARKAN KOLOM SORTING AKTIF ---
   const filterOptions = useMemo(() => {
     if (options && options.length > 0) return options
     if (!tableData || tableData.length === 0) return []
 
-    // Tentukan kolom mana yang dijadikan patokan urutan (fallback ke 'id' jika null)
     const sortColumn = sortConfig?.column || 'id'
     const isAscending = sortConfig?.ascending ?? true
-
-    // Gunakan Map untuk menyimpan relasi { "Teks Unik" => Nilai Order-nya }
     const uniqueMap = new Map<string, any>()
 
     tableData.forEach(row => {
@@ -66,31 +65,25 @@ const ColumnFilterPopover = ({
 
       if (rawVal !== null && rawVal !== undefined && rawVal !== '') {
         const strVal = String(rawVal)
-        
-        // Jika nilai belum ada di Map, simpan bersamaan dengan nilai order-nya
-        // Contoh: "Kejadian" => 1, "Keluaran" => 2
+
         if (!uniqueMap.has(strVal)) {
           uniqueMap.set(strVal, row[sortColumn])
         }
       }
     })
 
-    // Ubah Map menjadi Array dan urutkan berdasarkan nilai order-nya
     const sortedUniqueVals = Array.from(uniqueMap.entries()).sort((a, b) => {
-      const valA = a[1] // Nilai order dari item pertama
-      const valB = b[1] // Nilai order dari item kedua
+      const valA = a[1]
+      const valB = b[1]
 
-      // Fallback jika ada data yang kosong (taruh di bawah)
       if (valA == null && valB == null) return 0
       if (valA == null) return isAscending ? 1 : -1
       if (valB == null) return isAscending ? -1 : 1
 
-      // Logika khusus jika nilai urutannya adalah Angka (seperti global_order)
       if (typeof valA === 'number' && typeof valB === 'number') {
         return isAscending ? valA - valB : valB - valA
       }
 
-      // Logika standar jika nilai urutannya berupa Teks (Abjad)
       const strA = String(valA).toLowerCase()
       const strB = String(valB).toLowerCase()
       
@@ -100,10 +93,7 @@ const ColumnFilterPopover = ({
       return 0
     })
 
-    // Kembalikan ke format Autocomplete MUI { label, value }
     return sortedUniqueVals.map(([val]) => ({ label: val, value: val }))
-
-  // Jangan lupa masukkan sortConfig ke dalam dependency array
   }, [tableData, col, options, sortConfig])
 
   const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -120,15 +110,28 @@ const ColumnFilterPopover = ({
 
   const handleClear = () => {
     setTempValue([])
+    setInputValue('') // Clear input juga saat tombol Clear ditekan
     onApply(col, [])
     handleClose()
   }
 
-  const isFilterActive = tempValue.length > 0
+  const isFilterActive = tempValue.length > 0 || (Array.isArray(currentFilterValue) && currentFilterValue.length > 0)
 
   return (
     <>
-      <IconButton size='small' onClick={handleOpen} color={isFilterActive ? 'primary' : 'default'}>
+      <IconButton 
+        size='small' 
+        onClick={handleOpen} 
+
+        // 4. LOGIKA WARNA TOMBOL: Jika aktif, warna Primary dengan Background semi-transparan
+        sx={{ 
+          color: isFilterActive ? theme.palette.primary.main : 'default',
+          backgroundColor: isFilterActive ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
+          '&:hover': {
+            backgroundColor: isFilterActive ? alpha(theme.palette.primary.main, 0.2) : alpha(theme.palette.action.active, 0.05)
+          }
+        }}
+      >
         <i className={`text-base ${isFilterActive ? 'ri-filter-3-fill' : 'ri-filter-3-line'}`} />
       </IconButton>
 
@@ -155,6 +158,15 @@ const ColumnFilterPopover = ({
             onChange={(_event, newValue) => {
               setTempValue(newValue.map(v => v.value))
             }}
+            
+            // 5. FITUR PERTAHANAN INPUT: Jangan hapus teks saat user memilih item!
+            inputValue={inputValue}
+            onInputChange={(_, newInputValue, reason) => {
+              // Jika reason adalah 'reset' (biasanya terjadi setelah select), JANGAN hapus teksnya
+              if (reason === 'reset') return
+              setInputValue(newInputValue)
+            }}
+
             renderOption={(props, option, { selected }) => {
               const { key, ...otherProps } = props as any
 

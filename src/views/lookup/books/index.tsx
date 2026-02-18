@@ -8,7 +8,8 @@ const BooksTab = () => {
   return (
     <SupabaseTableRenderer 
       tableName='books' 
-      defaultSort={{ column: 'global_order', ascending: true }} 
+      defaultSort={{ column: 'global_order', ascending: true }}
+      defaultColumns={['category', 'kitab', 'pasal', 'total_verses', 'last_updated_at']}
     />
   )
 }

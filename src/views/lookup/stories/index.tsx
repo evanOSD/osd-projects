@@ -7,7 +7,8 @@ const StoriesTab = () => {
   return (
     <SupabaseTableRenderer 
       tableName='stories' 
-      defaultSort={{ column: 'global_order', ascending: true }} 
+      defaultSort={{ column: 'global_order', ascending: true }}
+      defaultColumns={['story_category', 'book_category', 'judul_cerita', 'dasar_perikop', 'last_updated_at']}
     />
   )
 }

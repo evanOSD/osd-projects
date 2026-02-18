@@ -11,12 +11,11 @@ import { useSupabaseTable } from './useSupabaseTable'
 
 type Props = {
   tableName: AllowedTableName | string
-  
-  // Tambahkan prop opsional untuk default sort
   defaultSort?: { column: string; ascending: boolean }
+  defaultColumns?: string[] // ✅ Tambahkan tipe props
 }
 
-const SupabaseTableRenderer = ({ tableName, defaultSort }: Props) => {
+const SupabaseTableRenderer = ({ tableName, defaultSort, defaultColumns }: Props) => {
   // Lempar defaultSort ke dalam custom hook
   const {
     tableData,
@@ -52,6 +51,7 @@ const SupabaseTableRenderer = ({ tableName, defaultSort }: Props) => {
         columns={tableColumns}
         data={tableData}
         requiredColumns={requiredColumns}
+        defaultColumns={defaultColumns}
         onSaveBatch={handleSaveBatch}
         onDeleteBatch={handleDeleteBatch}
         sortConfig={sortConfig}

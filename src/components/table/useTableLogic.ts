@@ -6,10 +6,9 @@ import toast from 'react-hot-toast'
 
 import type { TableProps } from './types'
 
-// Kita hanya butuh sebagian props untuk logika ini
 type UseTableLogicProps = Pick<
   TableProps,
-  'data' | 'columns' | 'requiredColumns' | 'onSaveBatch' | 'onDeleteBatch'
+  'data' | 'columns' | 'requiredColumns' | 'onSaveBatch' | 'onDeleteBatch' | 'defaultColumns'
 >
 
 export const useTableLogic = ({
@@ -17,8 +16,10 @@ export const useTableLogic = ({
   columns,
   requiredColumns = [],
   onSaveBatch,
-  onDeleteBatch
+  onDeleteBatch,
+  defaultColumns = []
 }: UseTableLogicProps) => {
+
   const [globalFilter, setGlobalFilter] = useState('')
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [draftChanges, setDraftChanges] = useState<Record<string, any>>({})
@@ -26,6 +27,24 @@ export const useTableLogic = ({
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(100)
 
+  const [hiddenColumns, setHiddenColumns] = useState<string[]>(() => {
+    if (defaultColumns && defaultColumns.length > 0) {
+      return columns.filter(col => !defaultColumns.includes(col))
+    }
+
+    return []
+  })
+
+  const handleToggleColumn = useCallback((column: string) => {
+    setHiddenColumns(prev => {
+      if (prev.includes(column)) {
+        return prev.filter(c => c !== column) // Show
+      } else {
+        return [...prev, column] // Hide
+      }
+    })
+  }, [])
+  
   const filteredData = useMemo(() => {
     const combinedData = [...newRows, ...data]
 
@@ -141,6 +160,8 @@ export const useTableLogic = ({
 
   // Mengembalikan semua state dan fungsi yang dibutuhkan oleh UI
   return {
+    hiddenColumns,       // Export state baru
+    handleToggleColumn,
     globalFilter,
     setGlobalFilter,
     selectedIds,

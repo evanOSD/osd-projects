@@ -13,16 +13,28 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import Checkbox from '@mui/material/Checkbox'
 import TablePagination from '@mui/material/TablePagination'
-import { alpha, useTheme } from '@mui/material/styles'
 import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+
+import { alpha, useTheme } from '@mui/material/styles'
 
 import TableToolbar from './TableToolbar'
 import EditableCell from './EditableCell'
 import ColumnFilterPopover from './ColumnFilterPopover'
 import type { TableProps } from './types'
-import { useTableLogic } from './useTableLogic' // <--- Import custom hook
+import { useTableLogic } from './useTableLogic'
 
 const LOCKED_COLUMNS = ['id', 'created_at', 'last_updated_at', 'last_updated_by']
+
+const toTitleCase = (str: string) => {
+  if (!str) return ''
+  
+return str
+    .replace(/_/g, ' ')                 // Ganti _ dengan spasi
+    .toLowerCase()                      // Ubah ke huruf kecil semua dulu
+    .replace(/\b\w/g, char => char.toUpperCase()) // Huruf pertama tiap kata jadi Besar
+}
 
 const Table = ({
   tableName,
@@ -35,11 +47,11 @@ const Table = ({
   sortConfig,
   onSortChange,
   filters = {},
-  onFilterChange
+  onFilterChange,
+  defaultColumns = [] // ✅ Tambahkan di props destructuring
 }: TableProps) => {
   const theme = useTheme()
 
-  // --- MENGGUNAKAN CUSTOM HOOK ---
   const {
     globalFilter,
     setGlobalFilter,
@@ -60,8 +72,15 @@ const Table = ({
     handleSave,
     handleDiscard,
     handleDeleteSelected,
-    handleAddRow
-  } = useTableLogic({ data, columns, requiredColumns, onSaveBatch, onDeleteBatch })
+    handleAddRow,
+    hiddenColumns,
+    handleToggleColumn,
+  } = useTableLogic({ data, columns, requiredColumns, defaultColumns, onSaveBatch, onDeleteBatch })
+
+  // --- 1. PERBAIKAN: Gunakan 'columns' langsung, bukan 'props.columns' ---
+  const visibleColumns = useMemo(() => {
+    return columns.filter(col => !hiddenColumns.includes(col))
+  }, [columns, hiddenColumns])
 
   const handleSortClick = (col: string) => {
     if (onSortChange) {
@@ -71,11 +90,59 @@ const Table = ({
     }
   }
 
+  // --- LOGIKA FOOTER STATUS ---
+  const footerStatusNode = useMemo(() => {
+    const statusItems = []
+
+    // 1. Status Sortir
+    if (sortConfig) {
+      statusItems.push(
+        <span key="sort" style={{ marginRight: 16 }}>
+          <strong>Sort:</strong> {toTitleCase(sortConfig.column)} ({sortConfig.ascending ? 'A->Z' : 'Z->A'})
+        </span>
+      )
+    }
+
+    // 2. Status Filter
+    const activeFilters = Object.entries(filters).filter(([, val]) =>
+      Array.isArray(val) ? val.length > 0 : !!val
+    )
+
+    if (activeFilters.length > 0) {
+      const filterNames = activeFilters.map(([col]) => toTitleCase(col))
+      
+      // Logika pemotongan jika lebih dari 3 filter
+      let filterText = ''
+
+      if (filterNames.length > 3) {
+        filterText = `${filterNames.slice(0, 3).join(', ')}, ...`
+      } else {
+        filterText = filterNames.join(', ')
+      }
+
+      statusItems.push(
+        <span key="filter">
+          <strong>Filter:</strong> {filterText}
+        </span>
+      )
+    }
+
+    if (statusItems.length === 0) return null
+
+    return (
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
+        {statusItems}
+      </Typography>
+    )
+  }, [sortConfig, filters])
+
+  // --- 2. PERBAIKAN: Gunakan visibleColumns untuk menentukan colspan ---
   const tableBodyRows = useMemo(() => {
     if (paginatedData.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={columns.length + 1} align='center' sx={{ py: 10 }}>
+          {/* Colspan disesuaikan dengan visibleColumns + checkbox */}
+          <TableCell colSpan={visibleColumns.length + 1} align='center' sx={{ py: 10 }}>
             Tidak ada data ditemukan.
           </TableCell>
         </TableRow>
@@ -105,7 +172,8 @@ const Table = ({
           <TableCell padding='checkbox'>
             <Checkbox color='primary' checked={isItemSelected} onChange={() => handleSelectOne(row.id)} />
           </TableCell>
-          {columns.map(col => {
+          {/* --- 3. PERBAIKAN: Gunakan visibleColumns di sini agar kolom tersembunyi tidak dirender --- */}
+          {visibleColumns.map(col => {
             const options = columnOptions?.[col]
             const isLocked = LOCKED_COLUMNS.includes(col)
             const originalValue = row[col]
@@ -129,7 +197,7 @@ const Table = ({
         </TableRow>
       )
     })
-  }, [paginatedData, selectedIds, draftChanges, columns, columnOptions, theme, handleSelectOne, handleCellSave])
+  }, [paginatedData, selectedIds, draftChanges, visibleColumns, columnOptions, theme, handleSelectOne, handleCellSave]) // Ganti dependency 'columns' jadi 'visibleColumns'
 
   return (
     <Paper
@@ -146,6 +214,9 @@ const Table = ({
         onAddRow={handleAddRow}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
+        columns={columns}       // Kirim semua kolom (untuk list menu)
+        hiddenColumns={hiddenColumns} // Kirim status hidden
+        onToggleColumn={handleToggleColumn} // Kirim fungsi toggle
       />
 
       <TableContainer sx={{ flex: '1 1 auto', overflow: 'auto' }}>
@@ -160,7 +231,8 @@ const Table = ({
                   onChange={handleSelectAll}
                 />
               </TableCell>
-              {columns.map(col => {
+              {/* --- 4. PERBAIKAN: Gunakan visibleColumns di Header --- */}
+              {visibleColumns.map(col => {
                 const isSortActive = sortConfig?.column === col
 
                 return (
@@ -174,42 +246,47 @@ const Table = ({
                     }}
                   >
                     <div className='flex items-center gap-2'>
-                      {/* 1. TOMBOL SORT (KIRI & SELALU MUNCUL) */}
+                      
                       <IconButton
-                        size='small'
+                        size="small"
                         onClick={() => handleSortClick(col)}
-                        color={isSortActive ? 'primary' : 'default'}
-                        sx={{ padding: '4px' }}
+                        sx={{ 
+                          padding: '4px',
+                          color: isSortActive ? theme.palette.primary.main : 'default',
+                          backgroundColor: isSortActive ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
+                          '&:hover': {
+                            backgroundColor: isSortActive ? alpha(theme.palette.primary.main, 0.2) : alpha(theme.palette.action.active, 0.05)
+                          }
+                        }}
                       >
-                        <i
+                        <i 
                           className={`text-base ${
-                            isSortActive
-                              ? sortConfig.ascending
-                                ? 'ri-arrow-up-line'
-                                : 'ri-arrow-down-line'
+                            isSortActive 
+                              ? (sortConfig?.ascending ? 'ri-arrow-up-line' : 'ri-arrow-down-line') 
                               : 'ri-arrow-up-down-line text-gray-400 opacity-50'
-                          }`}
+                          }`} 
                         />
                       </IconButton>
 
-                      {/* 2. TEKS HEADER (TENGAH & BISA DI-SELECT/COPY) */}
-                      <span className='flex-grow select-text cursor-text'>
-                        {col.replace(/_/g, ' ')}
+                      <span className="flex-grow select-text cursor-text">
+                        {toTitleCase(col)}
                         {requiredColumns.includes(col) && (
                           <span style={{ color: theme.palette.error.main, marginLeft: '4px' }}>*</span>
                         )}
-                        {LOCKED_COLUMNS.includes(col) && <i className='ml-1 text-xs ri-lock-line text-textDisabled' />}
+                        {LOCKED_COLUMNS.includes(col) && (
+                          <i className='ml-1 text-xs ri-lock-line text-textDisabled' />
+                        )}
                       </span>
 
-                      {/* 3. TOMBOL FILTER (KANAN) */}
                       <ColumnFilterPopover
                         col={col}
                         options={columnOptions[col]}
-                        currentFilterValue={filters[col] || ''}
+                        currentFilterValue={filters[col] || []}
                         onApply={(c, v) => onFilterChange && onFilterChange(c, v)}
                         tableData={data}
-                        sortConfig={sortConfig} // ✅ TAMBAHKAN BARIS INI
+                        sortConfig={sortConfig}
                       />
+                      
                     </div>
                   </TableCell>
                 )
@@ -221,17 +298,32 @@ const Table = ({
         </MuiTable>
       </TableContainer>
 
-      <TablePagination
-        rowsPerPageOptions={[100, 500, 1000]}
-        component='div'
-        count={filteredData.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage='Baris per halaman:'
-        sx={{ borderTop: '1px solid var(--mui-palette-divider)', flexShrink: 0 }}
-      />
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          px: 2,
+          borderTop: '1px solid var(--mui-palette-divider)',
+          flexShrink: 0
+        }}
+      >
+        <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+          {footerStatusNode}
+        </Box>
+
+        <TablePagination
+          rowsPerPageOptions={[100, 500, 1000]}
+          component='div'
+          count={filteredData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage='Baris:'
+          sx={{ borderTop: 0 }} 
+        />
+      </Box>
     </Paper>
   )
 }

@@ -11,6 +11,7 @@ export type TableProps = {
   columns: string[]
   data: any[]
   requiredColumns?: string[]
+  defaultColumns?: string[]
   columnOptions?: Record<string, { label: string; value: string }[]>
   onSaveBatch: (drafts: Record<string, any>) => void
   onDeleteBatch: (ids: string[]) => void
