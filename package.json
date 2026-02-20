@@ -24,6 +24,7 @@
     "@table-library/react-table-library": "^4.1.15",
     "apexcharts": "^3.49.1",
     "classnames": "^2.5.1",
+    "date-fns": "^4.1.0",
     "next": "^16.1.6",
     "react": "^18.3.1",
     "react-apexcharts": "^1.4.1",

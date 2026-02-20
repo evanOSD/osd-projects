@@ -10,6 +10,7 @@ export type TableProps = {
   tableName: string
   columns: string[]
   data: any[]
+  columnTypes?: Record<string, string>
   requiredColumns?: string[]
   defaultColumns?: string[]
   columnOptions?: Record<string, { label: string; value: string }[]>

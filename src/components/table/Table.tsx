@@ -19,6 +19,7 @@ import Box from '@mui/material/Box'
 
 import { alpha, useTheme } from '@mui/material/styles'
 
+import { renderCellContent } from './utils/formatUtils'
 import TableToolbar from './TableToolbar'
 import EditableCell from './EditableCell'
 import ColumnFilterPopover from './ColumnFilterPopover'
@@ -40,6 +41,7 @@ const Table = ({
   tableName,
   columns,
   data,
+  columnTypes = {},
   requiredColumns = [],
   columnOptions = {},
   onSaveBatch,
@@ -182,7 +184,12 @@ const Table = ({
             return (
               <TableCell key={`${row.id}-${col}`} sx={{ whiteSpace: 'nowrap', padding: '0px 8px' }}>
                 {isLocked ? (
-                  <div className='px-2 py-2 text-textDisabled'>{displayValue || '-'}</div>
+                  <div className='px-2 py-2 text-textDisabled'>
+                    
+                    {/* 2. ✅ GANTI {displayValue || '-'} MENJADI FUNGSI INI */}
+                    {renderCellContent(displayValue, columnTypes[col])}
+
+                  </div>
                 ) : (
                   <EditableCell
                     initialValue={displayValue}
@@ -197,7 +204,7 @@ const Table = ({
         </TableRow>
       )
     })
-  }, [paginatedData, selectedIds, draftChanges, visibleColumns, columnOptions, theme, handleSelectOne, handleCellSave]) // Ganti dependency 'columns' jadi 'visibleColumns'
+  }, [paginatedData, selectedIds, draftChanges, visibleColumns, columnTypes, columnOptions, theme, handleSelectOne, handleCellSave]) // Ganti dependency 'columns' jadi 'visibleColumns'
 
   return (
     <Paper

@@ -9,6 +9,8 @@ import CustomTable from '@/components/table/Table'
 import { type AllowedTableName, getRequiredColumnsForTable } from './tableConfig'
 import { useSupabaseTable } from './useSupabaseTable'
 
+import { useTableMetadata } from './hooks/useTableMetadata'
+
 type Props = {
   tableName: AllowedTableName | string
   defaultSort?: { column: string; ascending: boolean }
@@ -27,7 +29,9 @@ const SupabaseTableRenderer = ({ tableName, defaultSort, defaultColumns }: Props
     handleDeleteBatch,
     handleSortChange,
     handleFilterChange
-  } = useSupabaseTable(tableName, defaultSort) // <--- Di sini
+  } = useSupabaseTable(tableName, defaultSort)
+
+  const columnTypes = useTableMetadata(tableName)
 
   const requiredColumns = getRequiredColumnsForTable(tableName)
 
@@ -50,6 +54,7 @@ const SupabaseTableRenderer = ({ tableName, defaultSort, defaultColumns }: Props
         tableName={tableName}
         columns={tableColumns}
         data={tableData}
+        columnTypes={columnTypes}
         requiredColumns={requiredColumns}
         defaultColumns={defaultColumns}
         onSaveBatch={handleSaveBatch}
