@@ -1,33 +1,23 @@
-// Third-party Imports
-import 'react-perfect-scrollbar/dist/css/styles.css'
+// src/app/layout.tsx
 
-// Type Imports
-import type { ChildrenType } from '@core/types'
+import './globals.css'
+import { Inter } from 'next/font/google'
+import NextTopLoader from 'nextjs-toploader'
+import { Toaster } from 'react-hot-toast'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
-// Style Imports
-import '@/app/globals.css'
+const inter = Inter({ subsets: ['latin'] })
 
-import QueryProvider from '../providers/QueryProvider'
-
-// Generated Icon CSS Imports
-import '@assets/iconify-icons/generated-icons.css'
-
-export const metadata = {
-  title: 'OSD Projects',
-  description: 'OSD Project Management for staff only.'
-}
-
-const RootLayout = ({ children }: ChildrenType) => {
-  // Vars
-  const direction = 'ltr'
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html id='__next' dir={direction}>
-      <body className='flex is-full min-bs-full flex-auto flex-col'>
-        <QueryProvider>{children}</QueryProvider>
+    <html lang="id" suppressHydrationWarning>
+      <body className={`${inter.className} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <NextTopLoader color="#2563eb" showSpinner={false} />
+          {children}
+          <Toaster position="top-center" />
+        </ThemeProvider>
       </body>
     </html>
   )
 }
-
-export default RootLayout

@@ -1,0 +1,24 @@
+PS D:\OSD Staff Portal\vercel\osd-projects> npm run dev
+
+> osdproject@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.5:3000
+- Environments: .env
+
+✓ Starting...
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+        - include was updated to add '.next/dev/types/**/*.ts'
+
+  The following mandatory changes were made to your tsconfig.json:
+
+        - jsx was set to react-jsx (next.js uses the React automatic runtime)
+
+✓ Ready in 569ms
+
+ini kenapa?

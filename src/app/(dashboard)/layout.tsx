@@ -1,36 +1,22 @@
 // src/app/(dashboard)/layout.tsx
+import { cookies } from "next/headers"
+import VerticalNavbar from "@/components/layout/VerticalNavbar"
+import Topbar from "@/components/layout/Topbar"
 
-import Toaster from '@/components/layout/shared/Toaster'
-
-// Type Imports
-import type { ChildrenType } from '@core/types'
-
-// Layout Imports
-import LayoutWrapper from '@layouts/LayoutWrapper'
-import VerticalLayout from '@layouts/VerticalLayout'
-
-// Component Imports
-import Providers from '@components/Providers'
-import Navigation from '@components/layout/vertical/Navigation'
-import Navbar from '@components/layout/vertical/Navbar'
-import VerticalFooter from '@components/layout/vertical/Footer'
-
-const Layout = async ({ children }: ChildrenType) => {
-  // Vars
-  const direction = 'ltr'
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // BACA COOKIE DARI SERVER: Mencegah sidebar "jeglek"
+  const cookieStore = await cookies()
+  const sidebarCollapsed = cookieStore.get("sidebarCollapsed")?.value === "true"
 
   return (
-    <Providers direction={direction}>
-      <LayoutWrapper
-        verticalLayout={
-          <VerticalLayout navigation={<Navigation />} navbar={<Navbar />} footer={<VerticalFooter />}>
-            {children}
-          </VerticalLayout>
-        }
-      />
-      <Toaster />
-    </Providers>
+    <div className="flex h-screen overflow-hidden">
+      <VerticalNavbar defaultCollapsed={sidebarCollapsed} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Topbar />
+        <main className="flex-1 overflow-auto p-6">
+          {children}
+        </main>
+      </div>
+    </div>
   )
 }
-
-export default Layout

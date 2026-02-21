@@ -145,10 +145,11 @@ export default [
     },
   },
 
-  // 3. OVERRIDES (Khusus file TypeScript dan Iconify Bundle)
+  // 3. OVERRIDES
   {
-    // Catatan: Flat Config butuh "**/" agar mencakup file di dalam folder (mendalam)
-    files: ["**/*.ts", "**/*.tsx", "src/iconify-bundle/**/*"],
+    // Catatan: Mencakup semua file TS/TSX mendalam di project.
+    // 'src/iconify-bundle/*' telah dihapus karena foldernya sudah dihapus.
+    files: ["**/*.ts", "**/*.tsx"],
     rules: {
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-var-requires": "off",
