@@ -1,0 +1,114 @@
+Switched to a new branch 'beta'
+git checkout -b beta
+
+
+Saat Ingin Testing (Push ke Beta)
+git add .
+git commit -m "Fitur baru"
+git push origin beta
+
+
+Saat Fitur Sudah Aman dan Siap Rilis ke Live
+git checkout main
+git merge beta
+git push origin main
+
+
+# Untuk push ke main
+git add .
+git commit -m "deskripsi"
+git push
+
+
+
+# untuk cek akun github yang terhubung
+git config user.name
+git config user.email
+
+
+
+# pengecekkan ekstra Jika Anda ingin tahu akun mana yang punya akses untuk push, Anda bisa mengecek URL remote-nya:
+git remote -v
+
+
+# Langkah 1: Ganti "Kunci Akses" (Hapus Cache Autentikasi Windows)
+Agar Git meminta Anda login ulang dengan akun yang baru, kita harus menghapus ingatan Windows:
+- Buka menu Start Windows di laptop Anda.
+- Ketik Credential Manager (atau Pengelola Kredensial) dan buka aplikasinya.
+- Pilih tab Windows Credentials (Kredensial Windows).
+- Scroll ke bawah ke bagian Generic Credentials, lalu cari daftar yang berawalan git:https://github.com.
+- Klik baris tersebut untuk membukanya, lalu klik Remove (Hapus).
+
+# Langkah 2 : Ganti Identitas Commit (Nama & Email)
+# Jalankan dua perintah ini di terminal VS Code Anda saat ini (ganti bagian dalam tanda kutip dengan nama dan email akun GitHub untuk website ini):
+
+git config user.name "ceritabahasadaerah"
+git config user.email "ceritabahasadaerah@gmail.com"
+
+(Catatan: Perintah di atas sengaja tidak memakai --global agar perubahan ini hanya berlaku secara lokal di folder ceritabahasadaerah saja).
+
+# Langkah 3: Tes Push Ulang
+Sekarang, sistem sudah bersih dari akun lama untuk project ini. Silakan lakukan proses commit dan push untuk update Cron Job kita tadi:
+
+git add .
+git commit -m "feat: update cron job sync google sheets"
+git push origin main
+Karena cache password sudah kita hapus di Langkah 2, saat Anda menekan Enter pada perintah git push,
+sistem akan otomatis memunculkan jendela pop-up kecil (atau membuka browser) yang meminta Anda untuk Sign in to GitHub.
+
+
+==================================================
+        Daftar Perintah Git - OSD Projects
+==================================================
+
+--------------------------------------------------
+A. ALUR KERJA HARIAN (DI BRANCH BETA)
+--------------------------------------------------
+Gunakan alur ini saat kamu sedang ngoding fitur baru atau memperbaiki UI.
+
+1. git status
+   Tujuan: Melihat file apa saja yang berubah/merah.
+
+2. git add .
+   Tujuan: Menandai semua perubahan untuk disimpan.
+
+3. git commit -m "Keterangan perubahan"
+   Tujuan: Memberi label pada perubahan (seperti save point game).
+
+4. git push origin beta
+   Tujuan: Mengirim hasil kerja ke GitHub branch beta.
+
+--------------------------------------------------
+B. ALUR SINKRONISASI (MAIN HARUS SAMA DENGAN BETA)
+--------------------------------------------------
+Gunakan alur ini jika fitur di beta sudah OK dan ingin di-update ke main (production).
+
+1. git checkout main
+   Tujuan: Pindah dari branch beta ke branch main.
+
+2. git reset --hard beta
+   Tujuan: Memaksa branch main lokal mengikuti isi beta 100%. 
+   (Hati-hati: Segala perubahan di main yang tidak ada di beta akan hilang).
+
+3. git push origin main --force
+   Tujuan: Memaksa GitHub main mengikuti main lokal kita. 
+   (Wajib pakai --force karena kita melakukan reset --hard).
+
+4. git checkout beta
+   Tujuan: Kembali ke ruang kerja beta untuk lanjut ngoding.
+
+--------------------------------------------------
+C. PERINTAH DARURAT & TAMBAHAN
+--------------------------------------------------
+
+1. git branch
+   Tujuan: Cek sekarang lagi ada di branch mana (supaya tidak salah push).
+
+2. git fetch --all
+   Tujuan: Mengambil informasi terbaru dari GitHub tanpa mengubah file lokal.
+
+3. git checkout .
+   Tujuan: MEMBATALKAN semua perubahan file yang belum di-commit (Kembali ke kondisi terakhir).
+
+4. git clean -fd
+   Tujuan: Menghapus folder/file hantu yang tidak terdaftar di Git.
