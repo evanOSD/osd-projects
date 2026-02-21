@@ -1,3 +1,5 @@
+// src/@menu/components/vertical-menu/MenuItem.tsx
+
 'use client'
 
 // React Imports

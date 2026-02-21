@@ -1,3 +1,5 @@
+// src/components/layout/shared/Logo.tsx
+
 'use client'
 
 // React Imports

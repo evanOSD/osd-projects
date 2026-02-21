@@ -4,46 +4,43 @@ import { useState, useCallback, useEffect } from 'react'
 
 import toast from 'react-hot-toast'
 
+// Menggunakan Singleton Supabase Client (Menghilangkan warning GoTrueClient)
 import { createClient } from '@core/utils/supabaseClient'
 
 export const useSupabaseTable = (
   tableName: string, 
-  
-  // Terima param baru, set default fallback ke 'id' jika tidak diisi
   defaultSort: { column: string; ascending: boolean } = { column: 'id', ascending: true }
 ) => {
+
+  const supabase = createClient()
+
   const [tableData, setTableData] = useState<any[]>([])
   const [tableColumns, setTableColumns] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Gunakan defaultSort sebagai state awal saat pertama kali dirender
   const [sortConfig, setSortConfig] = useState<{ column: string; ascending: boolean } | null>(defaultSort)
   const [filters, setFilters] = useState<Record<string, string | string[]>>({})
 
   const fetchTableData = useCallback(async () => {
     setIsLoading(true)
-    const supabase = createClient()
 
-    let query = supabase.from(tableName).select('*')
+    let query = supabase.from(tableName as any).select('*')
 
     // 1. Terapkan Filter
     Object.entries(filters).forEach(([col, val]) => {
       if (Array.isArray(val)) {
-        // Jika val adalah array (multiple selection), gunakan .in()
         if (val.length > 0) {
           query = query.in(col, val)
         }
       } else if (val) {
-        // Fallback jika val adalah string (jika masih ada filter teks lama)
         query = query.ilike(col, `%${val}%`)
       }
     })
 
-    // 2. Terapkan Sorting (Karena state awal adalah defaultSort, logika ini akan langsung jalan)
+    // 2. Terapkan Sorting
     if (sortConfig) {
       query = query.order(sortConfig.column, { ascending: sortConfig.ascending })
     } else {
-      // Fallback aman seandainya sortConfig entah bagaimana menjadi null
       query = query.order(defaultSort.column, { ascending: defaultSort.ascending })
     }
 
@@ -62,9 +59,10 @@ export const useSupabaseTable = (
     }
 
     setIsLoading(false)
-  }, [tableName, sortConfig, filters, defaultSort.column, defaultSort.ascending]) // <-- tambahkan defaultSort ke dependency
+  }, [supabase, tableName, filters, sortConfig, defaultSort.column, defaultSort.ascending])
 
   useEffect(() => {
+    // Debounce fetch untuk mencegah spam query ke database
     const timer = setTimeout(() => {
       fetchTableData()
     }, 300)
@@ -72,9 +70,9 @@ export const useSupabaseTable = (
     return () => clearTimeout(timer)
   }, [fetchTableData])
 
-  const handleSaveBatch = async (drafts: Record<string, any>) => {
-    const supabase = createClient()
+  // --- PERBAIKAN: Membungkus semua handler dengan useCallback ---
 
+  const handleSaveBatch = useCallback(async (drafts: Record<string, any>) => {    
     const recordsToUpsert = Object.values(drafts).map(record => {
       const cleanedRecord: any = { ...record }
 
@@ -85,7 +83,7 @@ export const useSupabaseTable = (
       return cleanedRecord
     })
 
-    const { error } = await supabase.from(tableName).upsert(recordsToUpsert)
+    const { error } = await supabase.from(tableName as any).upsert(recordsToUpsert)
 
     if (error) {
       toast.error(`Gagal menyimpan: ${error.message}`)
@@ -93,13 +91,11 @@ export const useSupabaseTable = (
       toast.success('Data berhasil disimpan!')
       fetchTableData()
     }
-  }
+  }, [supabase, tableName, fetchTableData]) // Dependency ditambah
 
-  const handleDeleteBatch = async (ids: string[]) => {
-    if (!window.confirm(`Yakin ingin menghapus ${ids.length} baris data ini secara permanen?`)) return
-
-    const supabase = createClient()
-    const { error } = await supabase.from(tableName).delete().in('id', ids)
+  const handleDeleteBatch = useCallback(async (ids: string[]) => {
+    if (!window.confirm(`Yakin ingin menghapus ${ids.length} baris data ini secara permanen?`)) return    
+    const { error } = await supabase.from(tableName as any).delete().in('id', ids)
 
     if (error) {
       toast.error('Gagal menghapus data! Pastikan Anda punya akses.')
@@ -107,15 +103,15 @@ export const useSupabaseTable = (
       toast.success('Data berhasil dihapus!')
       fetchTableData()
     }
-  }
+  }, [supabase, tableName, fetchTableData]) // Dependency ditambah
 
-  const handleSortChange = (column: string, ascending: boolean) => {
+  const handleSortChange = useCallback((column: string, ascending: boolean) => {
     setSortConfig({ column, ascending })
-  }
+  }, []) // Kosong karena tidak bergantung pada state luar
 
-  const handleFilterChange = (column: string, value: string | string[]) => {
+  const handleFilterChange = useCallback((column: string, value: string | string[]) => {
     setFilters(prev => ({ ...prev, [column]: value }))
-  }
+  }, []) // Kosong karena menggunakan setState callback (prev)
 
   return {
     tableData,

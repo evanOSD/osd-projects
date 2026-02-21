@@ -1,3 +1,5 @@
+// src/components/layout/shared/search/Logo.tsx
+
 'use client'
 
 // MUI Imports

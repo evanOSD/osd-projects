@@ -1,3 +1,6 @@
+// src/components/layout/vertical/VerticalMenu.tsx
+'use client' // Tambahkan ini karena kita memakai hook Zustand
+
 // MUI Imports
 import Chip from '@mui/material/Chip'
 import { useTheme } from '@mui/material/styles'
@@ -10,6 +13,9 @@ import { Menu, SubMenu, MenuItem, MenuSection } from '@menu/vertical-menu'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
+
+// Store Import (Otak Global)
+import { useProjectStore } from '@/store/useProjectStore'
 
 // Styled Component Imports
 import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNavExpandIcon'
@@ -33,10 +39,15 @@ const VerticalMenu = () => {
   // Hooks
   const theme = useTheme()
   const { transitionDuration } = useVerticalNav()
+  
+  // Mengambil ID proyek yang sedang aktif dari Zustand
+  const { activeProjectId } = useProjectStore()
+
+  // PERBAIKAN 1: Jika tidak ada proyek, arahkan ke '#' saja agar tidak bentrok dengan '/projects'
+  const planProgressUrl = activeProjectId ? `/projects/${activeProjectId}/plan_progress` : '#'
 
   return (
 
-    // Menggunakan browser scroll agar smooth di macOS
     <div className='bs-full overflow-y-auto overflow-x-hidden' style={{ WebkitOverflowScrolling: 'touch' }}>
       <MenuSection label='Custom Pages'></MenuSection>
       <Menu
@@ -45,8 +56,26 @@ const VerticalMenu = () => {
         renderExpandedMenuItemIcon={{ icon: <i className='ri-circle-line' /> }}
         menuSectionStyles={menuSectionStyles(theme)}
       >
-        <MenuItem href='/lookup' icon={<img src='images/icons/lookup.svg' alt='Admin Icon' width={20} height={20} />}>
+        <MenuItem href='/lookup' icon={<img src='/images/icons/lookup.svg' alt='Admin Icon' width={20} height={20} />}>
           Lookup
+        </MenuItem>
+
+        {/* PERBAIKAN 2: Menu Projects dikembalikan normal (Hanya aktif persis di /projects) */}
+        <MenuItem 
+          href='/projects' 
+          icon={<img src='/images/icons/projects.svg' alt='Admin Icon' width={20} height={20} />}
+        >
+          Projects
+        </MenuItem>
+        
+        {/* PERBAIKAN 3: Menu Plan & Progress dibuat cerdas mendeteksi kata 'plan_progress' di URL */}
+        <MenuItem 
+          href={planProgressUrl} 
+          icon={<img src='/images/icons/plan_progress.svg' alt='Admin Icon' width={20} height={20} />}
+          exactMatch={false}
+          activeUrl='plan_progress' // <-- Kunci Rahasianya ada di sini!
+        >
+          Plan & Progress
         </MenuItem>
         <SubMenu label='Dashboard' icon={<i className='ri-home-smile-line' />}>
           <MenuItem href='/'>Analytics</MenuItem>

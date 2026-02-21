@@ -176,26 +176,52 @@ const Table = ({
           </TableCell>
           {/* --- 3. PERBAIKAN: Gunakan visibleColumns di sini agar kolom tersembunyi tidak dirender --- */}
           {visibleColumns.map(col => {
-            const options = columnOptions?.[col]
+            // 1. Ambil tipe kolom dari metadata Supabase
+            const colType = columnTypes?.[col]
+            
+            // 2. Ambil options manual dari props (jika ada)
+            let options = columnOptions?.[col]
+
+            // 3. ✨ OTOMATISASI: Jika tipe datanya boolean, paksakan jadi dropdown!
+            if (!options && (colType === 'bool' || colType === 'boolean')) {
+              options = [
+                { label: 'Ya', value: 'true' },
+                { label: 'Tidak', value: 'false' }
+              ]
+            }
+
             const isLocked = LOCKED_COLUMNS.includes(col)
             const originalValue = row[col]
-            const displayValue = draftChanges[row.id]?.[col] ?? originalValue
+            
+            // Konversi nilai boolean asli ke string agar dropdown HTML bisa membacanya
+            let displayValue = draftChanges[row.id]?.[col] ?? originalValue
+
+            if (colType === 'bool' || colType === 'boolean') {
+              displayValue = String(displayValue) // ubah true jadi "true"
+            }
 
             return (
               <TableCell key={`${row.id}-${col}`} sx={{ whiteSpace: 'nowrap', padding: '0px 8px' }}>
                 {isLocked ? (
                   <div className='px-2 py-2 text-textDisabled'>
-                    
-                    {/* 2. ✅ GANTI {displayValue || '-'} MENJADI FUNGSI INI */}
-                    {renderCellContent(displayValue, columnTypes[col])}
-
+                    {/* Render tampilan read-only */}
+                    {renderCellContent(displayValue, colType)}
                   </div>
                 ) : (
                   <EditableCell
                     initialValue={displayValue}
                     options={options}
                     theme={theme}
-                    onSave={newVal => handleCellSave(row.id, col, newVal, originalValue)}
+                    onSave={newVal => {
+                      // ✨ KEMBALIKAN KE BOOLEAN: Saat disave, ubah string "true" kembali ke boolean asli
+                      let finalVal: any = newVal
+
+                      if (colType === 'bool' || colType === 'boolean') {
+                        finalVal = newVal === 'true' ? true : newVal === 'false' ? false : null
+                      }
+                      
+                      handleCellSave(row.id, col, finalVal, originalValue)
+                    }}
                   />
                 )}
               </TableCell>

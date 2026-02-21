@@ -1,3 +1,5 @@
+// src/components/layout/shared/ModeDropdown.tsx
+
 'use client'
 
 // React Imports
