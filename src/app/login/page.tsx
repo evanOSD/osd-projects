@@ -18,8 +18,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          // Setelah login Google, arahkan ke rute penerima tamu kita tadi
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/callback`, 
         },
       })
 
@@ -33,8 +32,12 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-md rounded-3xl border-gray-200/50 bg-white/50 shadow-xl backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-900/40">
+      {/* MENGGANTI border-gray dan bg-white dengan border-border dan bg-surface 
+        sambil tetap mempertahankan efek transparansi (/50) dan kaca (backdrop-blur-xl) 
+      */}
+      <Card className="w-full max-w-md rounded-3xl border-border/50 bg-surface/50 shadow-xl backdrop-blur-xl">
         <CardHeader className="text-center space-y-2 pt-10">
+          {/* Warna teks otomatis diatur oleh komponen CardTitle & CardDescription yang sudah kita buat */}
           <CardTitle className="text-3xl">Login OSD</CardTitle>
           <CardDescription>Akses portal internal menggunakan akun Google Anda</CardDescription>
         </CardHeader>
@@ -43,7 +46,10 @@ export default function LoginPage() {
           <Button 
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 py-3.5 text-base bg-white text-gray-700 border border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white transition-all cursor-pointer"
+            // MENGGUNAKAN variant="outline" yang sudah kita rancang! 
+            // Ini akan otomatis menghapus kebutuhan menulis text-gray, bg-white, hover, dll.
+            variant="outline"
+            className="w-full flex items-center justify-center gap-3 py-3.5 text-base shadow-sm"
           >
             {isLoading ? (
                <span className="animate-spin text-xl">⏳</span>

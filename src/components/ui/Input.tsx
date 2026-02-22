@@ -1,21 +1,28 @@
 // src/components/ui/Input.tsx
 
 import type { InputHTMLAttributes } from 'react'
+import { cn } from "@/lib/utils"
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
 }
 
-export default function Input({ label, error, ...props }: InputProps) {
+export default function Input({ label, error, className, ...props }: InputProps) {
   return (
     <div className="w-full space-y-1.5">
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
+      {/* Label menggunakan text-muted untuk estetika profesional */}
+      {label && <label className="text-sm font-medium text-muted">{label}</label>}
       <input
-        className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none placeholder:text-gray-400 sm:text-sm"
+        className={cn(
+          "block w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-foreground shadow-sm transition-all focus:border-primary focus:ring-1 focus:ring-primary outline-none placeholder:text-muted/60 sm:text-sm",
+          error && "border-danger focus:border-danger focus:ring-danger",
+          className
+        )}
         {...props}
       />
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {/* Pesan error menggunakan variabel danger */}
+      {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   )
 }

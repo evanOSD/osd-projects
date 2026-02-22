@@ -4,7 +4,15 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("rounded-xl border border-gray-200 bg-white text-gray-950 shadow-sm dark:border-gray-800 dark:bg-[#1e293b] dark:text-gray-50", className)} {...props} />
+  // Menggunakan bg-surface dan border-border
+  <div 
+    ref={ref} 
+    className={cn(
+      "rounded-xl border border-border bg-surface text-foreground shadow-sm transition-colors", 
+      className
+    )} 
+    {...props} 
+  />
 ))
 Card.displayName = "Card"
 
@@ -14,12 +22,14 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(({ className, ...props }, ref) => (
-  <h3 ref={ref} className={cn("text-2xl font-semibold leading-none tracking-tight", className)} {...props} />
+  // Menggunakan text-lg agar berada di bawah H1 namun tetap tegas
+  <h3 ref={ref} className={cn("text-lg font-semibold leading-none tracking-tight text-foreground", className)} {...props} />
 ))
 CardTitle.displayName = "CardTitle"
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn("text-sm text-gray-500 dark:text-gray-400", className)} {...props} />
+  // Menggunakan text-muted yang sudah kita buat di Typography tadi
+  <p ref={ref} className={cn("text-sm text-muted", className)} {...props} />
 ))
 CardDescription.displayName = "CardDescription"
 

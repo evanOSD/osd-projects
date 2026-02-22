@@ -44,11 +44,12 @@ export default function Tooltip({ children, content, disabled = false }: Tooltip
       
       {mounted && isVisible && createPortal(
         <div
-          className="pointer-events-none fixed z-50 animate-tooltip whitespace-nowrap rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white shadow-xl dark:bg-gray-100 dark:text-gray-900"
+          // Menggunakan bg-foreground dan text-background agar tooltip menonjol
+          className="pointer-events-none fixed z-50 animate-tooltip whitespace-nowrap rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background shadow-xl"
           style={{ top: coords.top, left: coords.left }}
         >
           {content}
-          <div className="absolute -left-1 top-1/2 -mt-1 h-2 w-2 rotate-45 bg-gray-900 dark:bg-gray-100" />
+          <div className="absolute -left-1 top-1/2 -mt-1 h-2 w-2 rotate-45 bg-foreground" />
         </div>,
         document.body
       )}

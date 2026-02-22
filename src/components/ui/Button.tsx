@@ -1,29 +1,32 @@
 // src/components/ui/Button.tsx
 
 import type { ButtonHTMLAttributes } from 'react'
-import clsx, { type ClassValue } from 'clsx' // Perbaikan: import clsx secara default
-import { twMerge } from 'tailwind-merge'
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+import { cn } from "@/lib/utils" // Menggunakan utilitas cn yang sudah ada di proyek Anda
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'outline' | 'ghost'
+  variant?: 'primary' | 'outline' | 'ghost' | 'danger'
   isLoading?: boolean
 }
 
 export default function Button({ className, variant = 'primary', isLoading, children, ...props }: ButtonProps) {
   const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm',
-    outline: 'border border-gray-300 bg-transparent hover:bg-gray-50 text-gray-700',
-    ghost: 'bg-transparent hover:bg-gray-100 text-gray-600'
+    // Primary menggunakan Cyan (Pastel di Light, Neon di Dark)
+    primary: 'bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm',
+    
+    // Outline menggunakan border standar dan hover accent (sorotan halus)
+    outline: 'border border-border bg-transparent hover:bg-accent text-foreground',
+    
+    // Ghost tanpa border, hanya teks dengan hover accent
+    ghost: 'bg-transparent hover:bg-accent text-foreground',
+
+    // Tambahan varian Danger jika sewaktu-waktu dibutuhkan (sudah ada di globals.css)
+    danger: 'bg-danger text-danger-foreground hover:bg-danger-hover shadow-sm'
   }
 
   return (
     <button
       className={cn(
-        'cursor-pointer inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed',
+        'cursor-pointer inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-all outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed',
         variants[variant],
         className
       )}

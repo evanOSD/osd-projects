@@ -1,0 +1,6 @@
+Penjelasan Singkat (Kenapa ini bekerja):
+Angka pertama (189): Ini adalah kode warna Cyan di roda warna.
+
+Angka kedua (100%): Ini tingkat kesegaran warna (Saturation). Sebelumnya saya kasih 60% (makanya pudar). Sekarang 100%, jadi warnanya sangat "keluar".
+
+Angka ketiga (40% / 50%): Ini tingkat kecerahan (Lightness). 40% di mode terang akan membuatnya terlihat seperti biru laut yang pekat dan kuat.

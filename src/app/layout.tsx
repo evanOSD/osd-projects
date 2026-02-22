@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <NextTopLoader color="#2563eb" showSpinner={false} />
+          <NextTopLoader color="hsl(var(--primary))" showSpinner={false} />
           {children}
           <Toaster position="top-center" />
         </ThemeProvider>

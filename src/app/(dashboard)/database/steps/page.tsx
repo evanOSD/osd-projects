@@ -8,7 +8,7 @@ export default function BooksPage() {
     <div className="space-y-6">
       {/* H1 dihapus karena Tab sudah menjelaskannya */}
       <Card className="p-6">
-        <P>Ini adalah placeholder untuk area konten <strong>Books</strong>.</P>
+        <P>Ini adalah placeholder untuk area konten <strong>Steps</strong>.</P>
         <P>Nantinya tabel data buku akan kita letakkan di sini.</P>
       </Card>
     </div>

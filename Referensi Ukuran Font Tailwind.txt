@@ -1,0 +1,74 @@
+REFERENSI UKURAN FONT TAILWIND (9px - 28px)
+Catatan Umum:
+
+Satuan Dasar: 1rem = 16px.
+
+Arbitrary Value: Jika tidak ada class bawaan, gunakan format text-[...px].
+
+Daftar Ukuran:
+
+9px = text-[9px] (Arbitrary)
+
+10px = text-[10px] (Arbitrary)
+
+11px = text-[11px] (Arbitrary)
+
+12px = text-xs (Standard)
+
+13px = text-[13px] (Arbitrary)
+
+14px = text-sm (Standard)
+
+15px = text-[15px] (Arbitrary)
+
+16px = text-base (Standard / Default)
+
+17px = text-[17px] (Arbitrary)
+
+18px = text-lg (Standard)
+
+19px = text-[19px] (Arbitrary)
+
+20px = text-xl (Standard)
+
+21px = text-[21px] (Arbitrary)
+
+22px = text-[22px] (Arbitrary)
+
+23px = text-[23px] (Arbitrary)
+
+24px = text-2xl (Standard)
+
+25px = text-[25px] (Arbitrary)
+
+26px = text-[26px] (Arbitrary)
+
+27px = text-[27px] (Arbitrary)
+
+28px = text-3xl (Standard)
+
+Referensi Tambahan (Judul Besar):
+
+30px = text-[30px]
+
+36px = text-4xl (Standard - Sering untuk Mobile H1)
+
+48px = text-5xl (Standard - Sering untuk Desktop H1)
+
+Tips Penggunaan
+Dalam coding, jika Anda ingin ukuran yang tidak ada di standar Tailwind (misal 15px), Anda cukup menulisnya seperti ini:
+<p className="text-[15px]">Teks presisi 15px</p>
+
+Tailwind v4 (yang Anda gunakan) akan secara otomatis mengenali nilai di dalam kurung siku tersebut dan menghasilkan CSS yang tepat.
+
+# Apa Saja Selain <strong> dan <br>?
+Selain tebal dan pindah baris,
+berikut adalah elemen-elemen kecil yang sering terlupakan tapi sangat berguna untuk Database/Portal Staff:
+
+Code: Untuk menampilkan teks teknis (misal: ID Buku atau Kode Error).
+
+Mark: Untuk menyoroti teks (seperti pakai stabilo).
+
+Kbd: Untuk instruksi tombol keyboard (misal: "Tekan Enter").
+
+Link: Untuk teks yang bisa diklik.
