@@ -7,8 +7,6 @@ import { createPortal } from "react-dom"
 import { User } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
-// Import Anak-anak komponen
-// PERHATIKAN: Sesuaikan path UserProfile jika letaknya berbeda
 import UserProfile from "./UserProfile"
 import UserSettings from "./UserSettings"
 import LogoutButton from "./LogoutButton"
@@ -80,7 +78,6 @@ export default function UserDropdown() {
           className="fixed w-64 origin-top-right rounded-xl border border-border bg-surface shadow-xl outline-none z-50 animate-dropdown"
           style={{ top: coords.top, right: coords.right }}
         >
-          {/* Komponen-komponen rakitan dipanggil di sini */}
           <UserProfile userName={userName} userEmail={userEmail} />
           
           <div className="py-1">

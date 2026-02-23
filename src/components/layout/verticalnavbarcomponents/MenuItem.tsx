@@ -23,10 +23,6 @@ export default function MenuItem({ name, path, icon: Icon, isActive, isCollapsed
         className={cn(
           "flex items-center gap-3 rounded-lg py-2.5 transition-all cursor-pointer",
           isCollapsed ? 'justify-center px-0' : 'px-3',
-          
-          // PERBAIKAN: 
-          // 1. Hover dan Active sekarang memiliki background yang sama dan lebih saturated (bg-primary/20)
-          // 2. Teks DIKUNCI menjadi text-foreground (Hitam di Light Mode, Putih di Dark Mode)
           isActive
             ? 'bg-primary/20 text-foreground font-semibold'
             : 'text-foreground hover:bg-primary/20 font-medium'

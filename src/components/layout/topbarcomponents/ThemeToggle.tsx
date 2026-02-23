@@ -10,10 +10,8 @@ export default function ThemeToggle() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  // Mencegah error Hydration
   useEffect(() => setMounted(true), [])
 
-  // Mencegah layout shift (kedipan) sebelum komponen dirender di client
   if (!mounted) {
     return <div className="h-9 w-9" /> 
   }

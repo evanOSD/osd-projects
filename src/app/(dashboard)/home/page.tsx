@@ -1,8 +1,14 @@
 // src/app/(dashboard)/home/page.tsx
 
+import type { Metadata } from "next" // Tambahkan import ini
 import { PageTabs } from "@/components/ui/Tabs"
 import { P } from "@/components/ui/Typography"
 import { Card } from "@/components/ui/Card"
+
+// Tambahkan deklarasi judul halaman
+export const metadata: Metadata = {
+  title: "Home", // Nanti di browser jadinya: "Home | OSD Projects"
+}
 
 export default function HomePage() {
   return (

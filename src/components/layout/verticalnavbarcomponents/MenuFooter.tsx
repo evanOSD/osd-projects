@@ -13,7 +13,6 @@ export default function MenuFooter({ isCollapsed }: { isCollapsed: boolean }) {
       <Tooltip content="Bantuan" disabled={!isCollapsed}>
         <Link
           href="/help"
-          // PERBAIKAN: hover disamakan menjadi bg-primary/20 dan teks mutlak text-foreground
           className={cn(
             "flex items-center gap-3 rounded-lg py-2.5 transition-all cursor-pointer text-foreground hover:bg-primary/20",
             isCollapsed ? 'justify-center px-0' : 'px-3'

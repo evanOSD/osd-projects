@@ -44,7 +44,6 @@ export default function Tooltip({ children, content, disabled = false }: Tooltip
       
       {mounted && isVisible && createPortal(
         <div
-          // Menggunakan bg-foreground dan text-background agar tooltip menonjol
           className="pointer-events-none fixed z-50 animate-tooltip whitespace-nowrap rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background shadow-xl"
           style={{ top: coords.top, left: coords.left }}
         >

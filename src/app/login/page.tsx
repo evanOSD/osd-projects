@@ -32,10 +32,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      {/* MENGGANTI border-gray dan bg-white dengan border-border dan bg-surface 
-        sambil tetap mempertahankan efek transparansi (/50) dan kaca (backdrop-blur-xl) 
-      */}
-      <Card className="w-full max-w-md rounded-3xl border-border/50 bg-surface/50 shadow-xl backdrop-blur-xl">
+      
+      <Card className="w-full max-w-md rounded-3xl border-border/50 bg-surface/50 shadow-xl">
         <CardHeader className="text-center space-y-2 pt-10">
           {/* Warna teks otomatis diatur oleh komponen CardTitle & CardDescription yang sudah kita buat */}
           <CardTitle className="text-3xl">Login OSD</CardTitle>

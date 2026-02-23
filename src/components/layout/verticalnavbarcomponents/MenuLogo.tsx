@@ -12,7 +12,6 @@ interface MenuLogoProps {
 
 export default function MenuLogo({ isCollapsed, onToggle }: MenuLogoProps) {
   return (
-    // Mengganti border-gray menjadi border-border
     <div className={cn(
       "flex h-16 shrink-0 items-center border-b border-border overflow-hidden",
       isCollapsed ? 'justify-center px-0' : 'px-4'

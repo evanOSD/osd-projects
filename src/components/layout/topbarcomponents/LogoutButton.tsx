@@ -28,7 +28,6 @@ export default function LogoutButton() {
     <div className="border-t border-border py-1">
       <button 
         onClick={handleLogout}
-        // UBAH: hover disamakan intensitasnya menjadi bg-danger/20
         className="flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-sm font-medium text-danger transition-colors hover:bg-danger/20"
       >
         <LogOut size={16} /><span>Logout</span>

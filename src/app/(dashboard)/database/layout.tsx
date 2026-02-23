@@ -1,6 +1,11 @@
 // src/app/(dashboard)/database/layout.tsx
 
+import type { Metadata } from "next"
 import { PageTabs } from "@/components/ui/Tabs"
+
+export const metadata: Metadata = {
+  title: "Database",
+}
 
 const databaseTabs = [
   { name: 'Books', path: '/database/books' },
@@ -14,10 +19,6 @@ export default function DatabaseLayout({ children }: { children: React.ReactNode
   return (
     <>
       <PageTabs tabs={databaseTabs} />
-      
-      {/* KITA PINDAHKAN p-6 KE SINI. 
-          Jadi Tab tetap penuh di atas, tapi konten tabelnya rapi berjarak. 
-      */}
       <div className="p-6">
         {children}
       </div>

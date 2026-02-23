@@ -11,7 +11,6 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export default function Input({ label, error, className, ...props }: InputProps) {
   return (
     <div className="w-full space-y-1.5">
-      {/* Label menggunakan text-muted untuk estetika profesional */}
       {label && <label className="text-sm font-medium text-muted">{label}</label>}
       <input
         className={cn(
@@ -21,7 +20,6 @@ export default function Input({ label, error, className, ...props }: InputProps)
         )}
         {...props}
       />
-      {/* Pesan error menggunakan variabel danger */}
       {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   )
