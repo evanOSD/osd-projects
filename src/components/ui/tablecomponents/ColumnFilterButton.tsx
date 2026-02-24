@@ -28,7 +28,7 @@ export function ColumnFilterButton<TData, TValue>({ column }: ColumnFilterButton
           onClick={() => setIsOpen((prev) => !prev)}
           className={`p-1 cursor-pointer rounded-md transition-colors outline-none shrink-0 ${
             isActive
-              ? "bg-primary/10 text-primary hover:bg-primary/20"
+              ? "bg-yellow-300/70 text-primary hover:bg-yellow-300/70"
               : "bg-muted/0 hover:bg-muted/10 text-primary"
           }`}
         >

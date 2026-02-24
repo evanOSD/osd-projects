@@ -20,24 +20,29 @@ import {
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 
+import '@tanstack/react-table'
+declare module '@tanstack/react-table' {
+  interface TableMeta<TData extends unknown> {
+    updateData: (rowIndex: number, columnId: string, value: unknown) => void
+  }
+}
+
 interface UseDataTableProps<TData, TValue> {
   data: TData[]
   columns: ColumnDef<TData, TValue>[]
+  updateData?: (rowIndex: number, columnId: string, value: unknown) => void 
 }
 
-export function useDataTable<TData, TValue>({ data, columns }: UseDataTableProps<TData, TValue>) {
-  // 1. State Management
+export function useDataTable<TData, TValue>({ data, columns, updateData }: UseDataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
 
-  // Urutan Kolom
   const initialColumnOrder = useMemo(
     () => columns.map(c => (c.id as string) || (c as any).accessorKey),
     [columns]
   )
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(initialColumnOrder)
 
-  // 2. Inisialisasi TanStack Table
   const table = useReactTable({
     data,
     columns,
@@ -53,16 +58,17 @@ export function useDataTable<TData, TValue>({ data, columns }: UseDataTableProps
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    meta: {
+      updateData: updateData || (() => {}),
+    }
   })
 
-  // 3. Sensor DnD Kit
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 5 } }),
     useSensor(KeyboardSensor)
   )
 
-  // 4. Handler Drag End
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (active && over && active.id !== over.id) {
@@ -74,7 +80,6 @@ export function useDataTable<TData, TValue>({ data, columns }: UseDataTableProps
     }
   }
 
-  // 5. Kembalikan semua yang dibutuhkan oleh UI
   return {
     table,
     globalFilter,

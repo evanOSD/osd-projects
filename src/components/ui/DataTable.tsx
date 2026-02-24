@@ -15,9 +15,10 @@ import { Table, TableHeader, TableBody, TableRow, TableCell } from './Table'
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  updateData?: (rowIndex: number, columnId: string, value: unknown) => void 
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, updateData }: DataTableProps<TData, TValue>) {
   const {
     table,
     globalFilter,
@@ -27,7 +28,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     setColumnOrder,
     sensors,
     handleDragEnd,
-  } = useDataTable({ data, columns })
+  } = useDataTable({ data, columns, updateData })
 
   return (
     <div className='rounded-xl border border-border bg-surface shadow-sm flex flex-col overflow-hidden'>
