@@ -6,7 +6,7 @@ import { createServerClient } from '@supabase/ssr'
 // UBAH: Nama fungsi dari 'middleware' menjadi 'proxy'
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
-    request,
+    request
   })
 
   // 1. Buat "Pipa Supabase" versi Server
@@ -21,19 +21,17 @@ export async function proxy(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
-            request,
+            request
           })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
+          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+        }
+      }
     }
   )
 
   // 2. Cek Kartu Identitas (Apakah user sudah login?)
   const {
-    data: { user },
+    data: { user }
   } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
@@ -67,7 +65,5 @@ export async function proxy(request: NextRequest) {
 
 // 4. Tentukan area patroli Satpam (Abaikan aset statis)
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|images|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|images|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)']
 }

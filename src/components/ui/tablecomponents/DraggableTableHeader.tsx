@@ -5,13 +5,16 @@
 import { flexRender, Header } from '@tanstack/react-table'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripHorizontal } from 'lucide-react'
+import { GripVertical } from 'lucide-react'
 
 import { ColumnSortButton } from './ColumnSortButton'
 import { ColumnFilterButton } from './ColumnFilterButton'
-import MainContentTooltip from '@/components/ui/MainContentTooltip'
 
-export function DraggableTableHeader<TData, TValue>({ header }: { header: Header<TData, TValue> }) {
+interface DraggableTableHeaderProps<TData, TValue> {
+  header: Header<TData, TValue>
+}
+
+export function DraggableTableHeader<TData, TValue>({ header }: DraggableTableHeaderProps<TData, TValue>) {
   const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
     id: header.column.id
   })
@@ -22,7 +25,15 @@ export function DraggableTableHeader<TData, TValue>({ header }: { header: Header
     transform: CSS.Translate.toString(transform),
     transition,
     width: header.getSize(),
-    zIndex: isDragging ? 1 : 0
+    zIndex: isDragging ? 50 : 'auto'
+  }
+
+  if (header.column.id === 'select') {
+    return (
+      <th className='px-2 py-3 border-r border-border bg-surface text-center align-middle w-10 sticky left-0 z-30'>
+        {flexRender(header.column.columnDef.header, header.getContext())}
+      </th>
+    )
   }
 
   return (
@@ -30,31 +41,32 @@ export function DraggableTableHeader<TData, TValue>({ header }: { header: Header
       ref={setNodeRef}
       style={style}
       colSpan={header.colSpan}
-      className='px-4 py-3 font-semibold whitespace-nowrap bg-muted/5 border-r border-border/50 last:border-r-0 group'
+      className={`px-4 py-3 text-left font-semibold border-r border-border last:border-r-0 bg-surface align-middle ${
+        isDragging ? 'shadow-md bg-muted/50' : ''
+      }`}
     >
-      <div className='flex items-center gap-2'>
-        <MainContentTooltip content='Geser Kolom'>
-          <button
+      <div className='flex items-center justify-between gap-2 w-full'>
+        <div className='flex items-center gap-2 overflow-hidden'>
+          <div
             {...attributes}
             {...listeners}
-            className='cursor-grab active:cursor-grabbing text-foreground transition-colors outline-none'
+            className='cursor-grab text-muted-foreground/50 hover:text-foreground transition-colors outline-none shrink-0'
           >
-            <GripHorizontal size={16} />
-          </button>
-        </MainContentTooltip>
+            <GripVertical size={14} />
+          </div>
 
-        <div className='flex-1 text-foreground cursor-text truncate min-w-0'>
-          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+          <div className='truncate'>{flexRender(header.column.columnDef.header, header.getContext())}</div>
         </div>
 
-        <div className='flex items-center gap-0.5 opacity-60 hover:opacity-100 focus-within:opacity-100 transition-opacity'>
-          {header.column.getCanFilter() && <ColumnFilterButton column={header.column} />}
+        <div className='flex items-center gap-1 shrink-0'>
           {header.column.getCanSort() && (
             <ColumnSortButton
               isSorted={header.column.getIsSorted()}
               onClick={header.column.getToggleSortingHandler()}
             />
           )}
+
+          {header.column.getCanFilter() && <ColumnFilterButton column={header.column} />}
         </div>
       </div>
     </th>

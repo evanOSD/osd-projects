@@ -8,7 +8,7 @@ import MenuItem from './MenuItem'
 
 const menuItems = [
   { name: 'Dashboard', path: '/home', icon: House },
-  { name: 'Database', path: '/database/books', icon: Database } 
+  { name: 'Database', path: '/database/books', icon: Database }
 ]
 
 export default function MenuNavigation({ isCollapsed }: { isCollapsed: boolean }) {
@@ -17,9 +17,7 @@ export default function MenuNavigation({ isCollapsed }: { isCollapsed: boolean }
   return (
     <nav className='flex-1 space-y-2 p-4 overflow-y-auto'>
       {menuItems.map(item => {
-        const isActive = item.name === 'Database' 
-          ? pathname.startsWith('/database') 
-          : pathname.startsWith(item.path)
+        const isActive = item.name === 'Database' ? pathname.startsWith('/database') : pathname.startsWith(item.path)
 
         return (
           <MenuItem

@@ -1,9 +1,9 @@
 // src/components/ui/MainContentTooltip.tsx
 
-"use client"
+'use client'
 
-import React, { useState, useRef, useEffect } from "react"
-import { createPortal } from "react-dom"
+import React, { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface MainContentTooltipProps {
   children: React.ReactNode
@@ -14,21 +14,23 @@ export default function MainContentTooltip({ children, content }: MainContentToo
   const [isVisible, setIsVisible] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [coords, setCoords] = useState({ top: 0, left: 0 })
-  
+
   const triggerRef = useRef<HTMLDivElement>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const updatePosition = () => {
     if (!triggerRef.current || !tooltipRef.current) return
 
     const target = triggerRef.current.getBoundingClientRect()
     const tooltip = tooltipRef.current.getBoundingClientRect()
-    
+
     // Posisi default: di atas tombol dengan jarak 8px
     let top = target.top - tooltip.height - 8
-    let left = target.left + (target.width / 2) - (tooltip.width / 2)
+    let left = target.left + target.width / 2 - tooltip.width / 2
 
     const vw = window.innerWidth
     const vh = window.innerHeight
@@ -64,25 +66,27 @@ export default function MainContentTooltip({ children, content }: MainContentToo
 
   return (
     <>
-      <div 
+      <div
         ref={triggerRef}
-        className="inline-block"
+        className='inline-block'
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
       >
         {children}
       </div>
 
-      {mounted && isVisible && createPortal(
-        <div
-          ref={tooltipRef}
-          style={{ top: coords.top, left: coords.left, position: 'fixed' }}
-          className="pointer-events-none z-50 whitespace-nowrap rounded-md bg-foreground px-2.5 py-1.5 text-xs font-medium text-background shadow-lg"
-        >
-          {content}
-        </div>,
-        document.body
-      )}
+      {mounted &&
+        isVisible &&
+        createPortal(
+          <div
+            ref={tooltipRef}
+            style={{ top: coords.top, left: coords.left, position: 'fixed' }}
+            className='pointer-events-none z-50 whitespace-nowrap rounded-md bg-foreground px-2.5 py-1.5 text-xs font-medium text-background shadow-lg'
+          >
+            {content}
+          </div>,
+          document.body
+        )}
     </>
   )
 }

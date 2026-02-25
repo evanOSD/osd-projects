@@ -1,7 +1,7 @@
 // src/components/ui/Button.tsx
 
 import type { ButtonHTMLAttributes } from 'react'
-import { cn } from "@/lib/utils" // Menggunakan utilitas cn yang sudah ada di proyek Anda
+import { cn } from '@/lib/utils' // Menggunakan utilitas cn yang sudah ada di proyek Anda
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'outline' | 'ghost' | 'danger'
@@ -12,10 +12,10 @@ export default function Button({ className, variant = 'primary', isLoading, chil
   const variants = {
     // Primary menggunakan Cyan (Pastel di Light, Neon di Dark)
     primary: 'bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm',
-    
+
     // Outline menggunakan border standar dan hover accent (sorotan halus)
     outline: 'border border-border bg-transparent hover:bg-accent text-foreground',
-    
+
     // Ghost tanpa border, hanya teks dengan hover accent
     ghost: 'bg-transparent hover:bg-accent text-foreground',
 

@@ -12,7 +12,7 @@
     --surface-foreground: 222 47% 11%;
 
     /* PRIMARY: Pastel Cyan */
-    --primary: 189 100% 40%; /* Saturation 100%, Lightness 40% (Warna tebal) */
+    --primary: 189 100% 45%; /* Saturation 100%, Lightness 40% (Warna tebal) */
     --primary-hover: 189 100% 32%; /* Hover sedikit lebih gelap */
     --primary-foreground: 0 0% 100%; /* Karena primary sekarang gelap, teks di atasnya WAJIB putih */
 
