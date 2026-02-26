@@ -140,6 +140,8 @@ export function useBooksPageLogic() {
     setColumnFilters,
     sorting,
     setSorting,
+    manualSorting: true, 
+    manualFiltering: true, 
     isSaving: updateMutation.isPending || addMutation.isPending || deleteMutation.isPending,
     onAddRow: handleAddRow,
     onSave: handleSave,

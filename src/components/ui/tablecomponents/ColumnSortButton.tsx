@@ -2,7 +2,7 @@
 
 'use client'
 
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
+import { ArrowDownZA, ArrowUpAZ, ArrowUpDown } from 'lucide-react'
 import MainContentTooltip from '@/components/ui/MainContentTooltip'
 
 interface ColumnSortButtonProps {
@@ -11,11 +11,13 @@ interface ColumnSortButtonProps {
 }
 
 export function ColumnSortButton({ isSorted, onClick }: ColumnSortButtonProps) {
-  // Tombol dianggap aktif jika isSorted bernilai "asc" atau "desc" (bukan false)
   const isActive = isSorted !== false
 
+  const tooltipContent =
+    isSorted === 'asc' ? 'Hapus Urutan' : isSorted === 'desc' ? 'Urutkan Menaik (A-Z)' : 'Urutkan Menurun (Z-A)'
+
   return (
-    <MainContentTooltip content='Urutkan Kolom'>
+    <MainContentTooltip content={tooltipContent}>
       <button
         onClick={onClick}
         className={`p-1 cursor-pointer rounded-md transition-colors outline-none shrink-0 ${
@@ -25,8 +27,8 @@ export function ColumnSortButton({ isSorted, onClick }: ColumnSortButtonProps) {
         }`}
       >
         {{
-          asc: <ArrowUp size={18} />,
-          desc: <ArrowDown size={18} />
+          asc: <ArrowUpAZ size={18} />,
+          desc: <ArrowDownZA size={18} />
         }[isSorted as string] ?? <ArrowUpDown size={18} />}
       </button>
     </MainContentTooltip>

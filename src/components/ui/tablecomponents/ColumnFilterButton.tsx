@@ -15,14 +15,11 @@ interface ColumnFilterButtonProps<TData, TValue> {
 export function ColumnFilterButton<TData, TValue>({ column }: ColumnFilterButtonProps<TData, TValue>) {
   const [isOpen, setIsOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
-
-  // Ambil filter aktif untuk styling tombol
-  const columnFilterValue = column.getFilterValue() as string
-  const isActive = columnFilterValue !== undefined && columnFilterValue !== ''
+  const isActive = column.getIsFiltered()
 
   return (
     <>
-      <MainContentTooltip content='Filter Kolom Spesifik'>
+      <MainContentTooltip content={isActive ? 'Filter Aktif' : 'Filter Kolom'}>
         <button
           ref={buttonRef}
           onClick={() => setIsOpen(prev => !prev)}

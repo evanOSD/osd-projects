@@ -11,6 +11,8 @@ import { TableSave } from './TableSave'
 import { TableCancel } from './TableCancel'
 import { TableDeleteRow } from './TableDeleteRow'
 import { TableUnsavedChanges } from './TableUnsavedChanges'
+import { TableExport } from './TableExport'
+import { TableImport } from './TableImport'
 
 interface TableToolbarProps<TData> {
   table: Table<TData>
@@ -23,6 +25,7 @@ interface TableToolbarProps<TData> {
   onCancel?: () => void
   unsavedCount?: number
   isSaving?: boolean
+  onImportData?: (data: any[]) => void
 }
 
 export function TableToolbar<TData>({
@@ -35,7 +38,8 @@ export function TableToolbar<TData>({
   onCancel,
   onDeleteRows,
   unsavedCount = 0,
-  isSaving = false
+  isSaving = false,
+  onImportData
 }: TableToolbarProps<TData>) {
   const selectedRows = table.getSelectedRowModel().rows
   const selectedCount = selectedRows.length
@@ -49,6 +53,14 @@ export function TableToolbar<TData>({
       </div>
 
       <div className='flex items-center gap-2'>
+        {/* Tombol Import (Muncul jika ada handler) */}
+        {onImportData && <TableImport onImport={onImportData} />}
+
+        {/* Tombol Export (Selalu muncul karena generik) */}
+        <TableExport table={table} />
+
+        <div className='h-6 w-px bg-border mx-1'></div>
+
         <TableDeleteRow
           selectedCount={selectedCount}
           onClick={() => {
@@ -69,7 +81,9 @@ export function TableToolbar<TData>({
             <TableSave onClick={onSave} isLoading={isSaving} />
           </>
         )}
-        <div className='w-px h-6 bg-border mx-1'></div>
+
+        <div className='h-6 w-px bg-border mx-1'></div>
+
         <ColumnVisibilityDropdown table={table} />
         <ResetColumnButton onClick={onResetColumns} />
       </div>

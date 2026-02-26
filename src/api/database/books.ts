@@ -29,7 +29,7 @@ export const booksApi = {
     })
 
     if (sorting.length > 0) {
-      sorting.forEach((sort) => {
+      sorting.forEach(sort => {
         query = query.order(sort.id, { ascending: !sort.desc })
       })
     } else {
@@ -44,7 +44,6 @@ export const booksApi = {
   updateBook: async (id: string, payload: BookUpdate) => {
     const supabase = createClient()
     const { data, error } = await supabase.from('books').update(payload).eq('id', id).select().single()
-
     if (error) throw new Error(error.message)
     return data as BookRow
   },
@@ -52,7 +51,6 @@ export const booksApi = {
   addBook: async (payload: BookInsert) => {
     const supabase = createClient()
     const { data, error } = await supabase.from('books').insert(payload).select().single()
-
     if (error) throw new Error(error.message)
     return data as BookRow
   },
@@ -60,35 +58,30 @@ export const booksApi = {
   deleteBook: async (id: string) => {
     const supabase = createClient()
     const { error } = await supabase.from('books').delete().eq('id', id)
-
-    if (error) {
-      console.error(`[DEBUG - DELETE ERROR]`, error.message)
-      throw new Error(error.message)
-    }
+    if (error) throw new Error(error.message)
     return true
   },
 
   getUniqueColumnValues: async (columnName: keyof BookRow) => {
     const supabase = createClient()
+    
     const { data, error } = await supabase
       .from('books')
       .select(`${String(columnName)}, global_order`)
+      .not(columnName as string, 'is', null)
       .order('global_order', { ascending: true })
-      .limit(5000)
 
-    if (error) {
-      console.error(`[DEBUG - API ERROR]`, error.message)
-      throw new Error(error.message)
-    }
+    if (error) throw new Error(error.message)
 
     const uniqueValues = new Set<string>()
+    
     data.forEach(row => {
-      const val = String((row as Record<string, any>)[columnName])
-      if (val && val !== 'null' && val !== 'undefined') uniqueValues.add(val)
+      const val = (row as any)[columnName]
+      if (val !== null && val !== undefined && String(val).trim() !== '') {
+        uniqueValues.add(String(val))
+      }
     })
 
-    const finalOptions = Array.from(uniqueValues)
-
-    return finalOptions
+    return Array.from(uniqueValues)
   }
 }
