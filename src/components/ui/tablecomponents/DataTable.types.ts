@@ -22,6 +22,10 @@ export interface DataTableProps<TData, TValue> {
   sorting?: any
   setSorting?: any
   manualSorting?: boolean
+  selectedRowDisplayColumns?: string[]
+  defaultColumnPinning?: { left?: string[]; right?: string[] }
+  enableExpanding?: boolean
+  expandColumns?: string[]
   renderSubComponent?: (props: { row: Row<TData> | any }) => ReactElement
   onImportData?: (data: any[]) => void
 }

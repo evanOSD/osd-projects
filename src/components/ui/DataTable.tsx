@@ -9,9 +9,16 @@ import { TableToolbar } from './tablecomponents/TableToolbar'
 import { DataTableProps } from './tablecomponents/DataTable.types'
 import { DataTableHead } from './tablecomponents/DataTableHead'
 import { DataTableBody } from './tablecomponents/DataTableBody'
+import { TemplateExpandedDetail } from './tablecomponents/TemplateExpandedDetail'
+
+const DUMMY_EXPAND_FN = () => <></>
 
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
-  const tableLogic = useDataTable(props)
+  const tableLogic = useDataTable({
+    ...props,
+    renderSubComponent: props.renderSubComponent || (props.enableExpanding ? DUMMY_EXPAND_FN : undefined)
+  })
+
   const tableContainerRef = useRef<HTMLDivElement>(null)
 
   const virtualizer = useTableVirtualization({
@@ -21,6 +28,14 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
     isFetchingNextPage: props.isFetchingNextPage,
     fetchNextPage: props.fetchNextPage
   })
+
+  const finalRenderSubComponent = props.renderSubComponent
+    ? props.renderSubComponent
+    : props.enableExpanding
+      ? ({ row }: { row: any }) => (
+          <TemplateExpandedDetail row={row} table={tableLogic.table} expandColumns={props.expandColumns} />
+        )
+      : undefined
 
   return (
     <div className='rounded-xl border border-border bg-surface shadow-sm flex flex-col overflow-hidden'>
@@ -36,15 +51,22 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
         unsavedCount={props.unsavedCount}
         isSaving={props.isSaving}
         onImportData={props.onImportData}
+        // TAMBAHKAN INI: Lempar props template kolom ke toolbar
+        selectedRowDisplayColumns={props.selectedRowDisplayColumns}
       />
 
-      {/* BERSIH! Tidak ada lagi DndContext. Murni div scroll biasa! */}
       <div
         ref={tableContainerRef}
-        className='max-h-[calc(100vh-280px)] overflow-auto relative w-full [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full'
+        className='max-h-[calc(100vh-280px)] overflow-auto relative w-full 
+          [&::-webkit-scrollbar]:w-2.5 
+          [&::-webkit-scrollbar]:h-2.5 
+          [&::-webkit-scrollbar-thumb]:bg-border 
+          [&::-webkit-scrollbar-thumb:hover]:bg-muted-foreground/80 
+          [&::-webkit-scrollbar-thumb:active]:bg-muted-foreground/80 
+          [&::-webkit-scrollbar-thumb]:rounded-full'
       >
         <table
-          className='text-sm text-left border-collapse table-fixed'
+          className='text-sm text-left border-collapse table-fixed bg-surface'
           style={{ width: tableLogic.table.getTotalSize(), minWidth: '100%' }}
         >
           <DataTableHead table={tableLogic.table} columnOrder={tableLogic.columnOrder} />
@@ -57,7 +79,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
             paddingBottom={virtualizer.paddingBottom}
             measureElement={virtualizer.measureElement}
             isFetchingNextPage={props.isFetchingNextPage}
-            renderSubComponent={props.renderSubComponent}
+            renderSubComponent={finalRenderSubComponent}
           />
         </table>
       </div>

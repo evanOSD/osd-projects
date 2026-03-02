@@ -41,14 +41,6 @@ export function EditableCell<TData, TValue>({
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') (e.currentTarget as HTMLElement).blur()
-    if (e.key === 'Escape') {
-      setValue(initialValue)
-      ;(e.currentTarget as HTMLElement).blur()
-    }
-  }
-
   const handleCopy = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -58,33 +50,82 @@ export function EditableCell<TData, TValue>({
   }
 
   return (
-    <div className='relative flex items-center w-full min-h-6 group'>
-      <input
-        type={type}
-        value={value ?? ''}
-        onChange={e => setValue(e.target.value)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => {
-          setIsFocused(false)
-          handleSave()
-        }}
-        onKeyDown={handleKeyDown}
-        className={`w-full bg-transparent border border-transparent px-2 py-1 -mx-2 rounded-sm text-sm outline-none transition-all z-10 cursor-text hover:border-border focus:bg-surface focus:border-primary focus:shadow-sm focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-calendar-picker-indicator]:cursor-pointer ${
-          !isFocused && displayComponent
-            ? 'text-transparent [&::-webkit-datetime-edit]:text-transparent'
-            : 'text-foreground [&::-webkit-datetime-edit]:text-foreground'
-        } ${className}`}
-      />
-
-      {!isFocused && displayComponent && (
-        <div className={`absolute inset-0 pointer-events-none flex items-center px-2 -mx-2 text-sm z-0 ${className}`}>
-          {displayComponent}
+    <div className='relative flex w-full group min-h-7'>
+      {!isFocused ? (
+        /* MODE BACA: Berupa <div> biasa yang menampung teks wrapped */
+        <div
+          tabIndex={0}
+          onFocus={() => setIsFocused(true)}
+          className={`w-full px-2 py-1 -mx-2 rounded-sm text-sm cursor-text border border-transparent hover:border-border transition-colors whitespace-normal wrap-break-word outline-none focus:ring-1 focus:ring-primary/50 ${className}`}
+        >
+          {displayComponent || (value !== null && value !== undefined && String(value) !== '' ? String(value) : '')}
         </div>
+      ) : type === 'text' ? (
+        /* MODE EDIT (TEKS): Berupa <textarea> yang auto-resize sesuai konten */
+        <textarea
+          autoFocus
+          value={value ?? ''}
+          onChange={e => setValue(e.target.value)}
+          onFocus={e => {
+            // Memindahkan kursor ke ujung teks
+            const val = e.target.value
+            e.target.value = ''
+            e.target.value = val
+          }}
+          onBlur={() => {
+            setIsFocused(false)
+            handleSave()
+          }}
+          onKeyDown={e => {
+            // Tekan Enter biasa untuk Save. Tekan Shift+Enter untuk baris baru.
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              ;(e.currentTarget as HTMLElement).blur()
+            }
+            if (e.key === 'Escape') {
+              setValue(initialValue)
+              ;(e.currentTarget as HTMLElement).blur()
+            }
+          }}
+          // CSS Hack untuk Auto-Height pada Textarea
+          onInput={e => {
+            e.currentTarget.style.height = 'auto'
+            e.currentTarget.style.height = e.currentTarget.scrollHeight + 'px'
+          }}
+          ref={el => {
+            if (el) {
+              el.style.height = 'auto'
+              el.style.height = el.scrollHeight + 'px'
+            }
+          }}
+          rows={1}
+          className={`w-full bg-surface border border-primary px-2 py-1 -mx-2 rounded-sm text-sm outline-none shadow-sm ring-1 ring-primary resize-none overflow-hidden whitespace-normal wrap-break-word ${className}`}
+        />
+      ) : (
+        /* MODE EDIT (NON-TEKS - Date/Number): Tetap pakai input biasa */
+        <input
+          type={type}
+          autoFocus
+          value={value ?? ''}
+          onChange={e => setValue(e.target.value)}
+          onBlur={() => {
+            setIsFocused(false)
+            handleSave()
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') (e.currentTarget as HTMLElement).blur()
+            if (e.key === 'Escape') {
+              setValue(initialValue)
+              ;(e.currentTarget as HTMLElement).blur()
+            }
+          }}
+          className={`w-full bg-surface border border-primary px-2 py-1 -mx-2 min-h-7 rounded-sm text-sm outline-none shadow-sm ring-1 ring-primary ${className}`}
+        />
       )}
 
       {isCopyable && !isFocused && (
-        // --- TEMPLATE UNIVERSAL: Gunakan variabel bg-surface, border-border, bg-muted, dll ---
-        <div className='hidden group-hover:flex absolute right-0 top-1/2 -translate-y-1/2 py-0.5 pl-2 z-10 bg-linear-to-l from-surface via-surface to-transparent'>
+        /* PERBAIKAN: Tombol copy menutupi pinggiran kanan layar dengan gradient penuh secara vertikal */
+        <div className='hidden group-hover:flex absolute right-0 top-0 bottom-0 items-center py-0.5 pl-2 z-10 bg-linear-to-l from-surface via-surface to-transparent'>
           <MainContentTooltip content={copied ? 'Tersalin!' : 'Salin'}>
             <button
               type='button'

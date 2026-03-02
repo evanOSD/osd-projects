@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 const databaseTabs = [
   { name: 'Books', path: '/database/books' },
-  { name: 'Stories', path: '/database/stories' },
   { name: 'Passages', path: '/database/passages' },
+  { name: 'Stories', path: '/database/stories' },
   { name: 'Languages', path: '/database/languages' },
   { name: 'Steps', path: '/database/steps' },
 ]

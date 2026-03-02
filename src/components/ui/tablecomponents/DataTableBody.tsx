@@ -35,7 +35,7 @@ export function DataTableBody<TData, TValue>({
     return (
       <TableBody>
         <TableRow>
-          <TableCell colSpan={columns.length + 1} className='h-24 text-center text-muted'>
+          <TableCell colSpan={columns.length + 2} className='h-24 text-center text-muted'>
             Tidak ada data yang cocok dengan pencarian Anda.
           </TableCell>
         </TableRow>
@@ -47,7 +47,7 @@ export function DataTableBody<TData, TValue>({
     <TableBody>
       {paddingTop > 0 && (
         <tr>
-          <td style={{ height: `${paddingTop}px` }} colSpan={columns.length + 1} />
+          <td style={{ height: `${paddingTop}px` }} colSpan={columns.length + 2} />
         </tr>
       )}
 
@@ -65,7 +65,10 @@ export function DataTableBody<TData, TValue>({
               {row.getVisibleCells().map((cell, index) => {
                 const isPinned = cell.column.getIsPinned()
 
-                // KUNCI ABSOLUT: Tiga serangkai width ini yang membuat resize & freeze aman!
+                // LOGIKA DETEKSI BATAS KANAN
+                const isLastLeftPinnedColumn = isPinned === 'left' && cell.column.getIsLastColumn('left')
+                const shouldHaveBorder = isLastLeftPinnedColumn && cell.column.id !== 'select'
+
                 const cellStyle: React.CSSProperties = {
                   width: cell.column.getSize(),
                   minWidth: cell.column.getSize(),
@@ -76,12 +79,18 @@ export function DataTableBody<TData, TValue>({
                   zIndex: isPinned ? 10 : 0
                 }
 
+                // Ganti border-r-2 menjadi kelas pseudo-element yang terisolasi!
+                const borderClass = shouldHaveBorder
+                  ? "after:content-[''] after:absolute after:top-0 after:bottom-0 after:right-0 after:w-[2px] after:bg-border after:z-10 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.1)]"
+                  : ''
+
                 return (
                   <TableCell
                     key={cell.id}
                     style={cellStyle}
                     className={`
-                      ${isPinned ? 'bg-surface shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] group-hover:brightness-95 dark:group-hover:brightness-110 transition-all' : ''} 
+                      ${isPinned ? 'bg-surface group-hover:brightness-95 dark:group-hover:brightness-110 transition-all' : ''} 
+                      ${borderClass}
                       ${isTemporary && index === 0 ? 'border-l-2 border-l-warning' : ''}
                     `}
                   >
@@ -89,12 +98,14 @@ export function DataTableBody<TData, TValue>({
                   </TableCell>
                 )
               })}
+
+              <td className='w-full' />
             </TableRow>
 
             {row.getIsExpanded() && renderSubComponent && (
               <tr>
                 <td
-                  colSpan={row.getVisibleCells().length}
+                  colSpan={row.getVisibleCells().length + 1}
                   className='bg-muted/10 p-4 border-b border-border shadow-inner'
                 >
                   {renderSubComponent({ row })}
@@ -107,13 +118,13 @@ export function DataTableBody<TData, TValue>({
 
       {paddingBottom > 0 && (
         <tr>
-          <td style={{ height: `${paddingBottom}px` }} colSpan={columns.length + 1} />
+          <td style={{ height: `${paddingBottom}px` }} colSpan={columns.length + 2} />
         </tr>
       )}
 
       {isFetchingNextPage && (
         <TableRow>
-          <TableCell colSpan={columns.length + 1} className='h-16 text-center text-muted bg-surface/50'>
+          <TableCell colSpan={columns.length + 2} className='h-16 text-center text-muted bg-surface/50'>
             <div className='flex items-center justify-center gap-2 text-sm font-medium'>
               <Loader2 size={16} className='animate-spin text-primary' />
               Memuat baris selanjutnya...

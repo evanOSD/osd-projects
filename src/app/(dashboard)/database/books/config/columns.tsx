@@ -2,183 +2,83 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import { BookRow, booksApi } from '@/api/database/books'
-import { EditableCell } from '@/components/ui/tablecomponents/EditableCell'
-import { EditableCellDropdown } from '@/components/ui/tablecomponents/EditableCellDropdown'
-import { Badge } from '@/components/ui/Badge'
-import { formatDateTime } from '@/lib/formatters'
-import { useState, useEffect } from 'react'
+import { createStandardColumn } from '@/components/ui/tablecomponents/ColumnHelper'
 
-const multiSelectFilter = (row: any, columnId: string, filterValue: string[]) => {
-  if (!filterValue || filterValue.length === 0) return true
-  const rowValue = row.getValue(columnId)
-  return filterValue.includes(String(rowValue))
-}
-
-const DynamicCategoryCell = ({ getValue, row, column, table }: any) => {
-  const [options, setOptions] = useState<string[]>([])
-  const val = getValue() as string
-
-  useEffect(() => {
-    booksApi.getUniqueColumnValues('category').then(setOptions)
-  }, [])
-
-  const badgeVariant = val === 'Old Testament' ? 'warning' : 'info'
-
-  return (
-    <EditableCellDropdown
-      getValue={getValue}
-      row={row}
-      column={column}
-      table={table}
-      options={options}
-      displayComponent={<Badge variant={badgeVariant}>{val || '-'}</Badge>}
-    />
-  )
-}
+// Helper kecil agar tidak perlu mengulang penulisan fetcher
+const fetchBooksFilter = (col: keyof BookRow) => () => booksApi.getUniqueColumnValues(col)
 
 export const bookColumns: ColumnDef<BookRow>[] = [
-  {
-    accessorKey: 'id',
+  createStandardColumn<BookRow>({
+    id: 'id',
     header: 'ID',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('id')
-      }
-    },
-    cell: ({ getValue, row, column, table }) => (
-      <EditableCell
-        getValue={getValue}
-        row={row}
-        column={column}
-        table={table}
-        displayComponent={<span className='truncate max-w-30'>{getValue() as string}</span>}
-        isCopyable
-      />
-    )
-  },
-  {
-    accessorKey: 'global_order',
+    dataType: 'uuid',
+    isReadOnly: true,
+    isCopyable: true,
+    fetchFilterOptions: fetchBooksFilter('id')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'global_order',
     header: 'Global Order',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('global_order')
-      }
-    },
-    cell: ({ getValue, row, column, table }) => (
-      <EditableCell getValue={getValue} row={row} column={column} table={table} type='number' />
-    )
-  },
-  {
-    accessorKey: 'scripture_id',
+    dataType: 'number',
+    fetchFilterOptions: fetchBooksFilter('global_order')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'scripture_id',
     header: 'Scripture ID',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('scripture_id')
-      }
-    },
-    cell: ({ getValue, row, column, table }) => (
-      <EditableCell getValue={getValue} row={row} column={column} table={table} isCopyable />
-    )
-  },
-  {
-    accessorKey: 'category',
+    dataType: 'text',
+    isCopyable: true,
+    fetchFilterOptions: fetchBooksFilter('scripture_id')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'category',
     header: 'Kategori',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('category')
-      }
-    },
-    cell: DynamicCategoryCell
-  },
-  {
-    accessorKey: 'kitab',
+    dataType: 'text',
+    dropdownOptions: ['Old Testament', 'New Testament'],
+    fetchFilterOptions: fetchBooksFilter('category')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'kitab',
     header: 'Kitab',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('kitab')
-      }
-    },
-    cell: ({ getValue, row, column, table }) => (
-      <EditableCell getValue={getValue} row={row} column={column} table={table} />
-    )
-  },
-  {
-    accessorKey: 'book',
-    header: 'Book',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('book')
-      }
-    },
-    cell: ({ getValue, row, column, table }) => (
-      <EditableCell getValue={getValue} row={row} column={column} table={table} />
-    )
-  },
-  {
-    accessorKey: 'pasal',
+    dataType: 'text',
+    fetchFilterOptions: fetchBooksFilter('kitab')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'pasal',
     header: 'Pasal',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('pasal')
-      }
-    },
-    cell: ({ getValue, row, column, table }) => (
-      <EditableCell getValue={getValue} row={row} column={column} table={table} type='number' />
-    )
-  },
-  {
-    accessorKey: 'chapter',
+    dataType: 'number',
+    fetchFilterOptions: fetchBooksFilter('pasal')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'book',
+    header: 'Book',
+    dataType: 'text',
+    fetchFilterOptions: fetchBooksFilter('book')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'chapter',
     header: 'Chapter',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('chapter')
-      }
-    },
-    cell: ({ getValue, row, column, table }) => (
-      <EditableCell getValue={getValue} row={row} column={column} table={table} type='number' />
-    )
-  },
-  {
-    accessorKey: 'last_updated_by',
-    header: 'Updated By',
-    size: 200,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('last_updated_by')
-      }
-    },
-    cell: ({ getValue }) => <span className='text-muted-foreground'>{(getValue() as string) || '-'}</span>
-  },
-  {
-    accessorKey: 'last_updated_at',
+    dataType: 'number',
+    fetchFilterOptions: fetchBooksFilter('chapter')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'total_verses',
+    header: 'Total Verses',
+    dataType: 'number',
+    fetchFilterOptions: fetchBooksFilter('total_verses')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'last_updated_at',
     header: 'Last Updated At',
-    size: 250,
-    filterFn: multiSelectFilter,
-    meta: {
-      filterOptions: {
-        fetcher: () => booksApi.getUniqueColumnValues('last_updated_at')
-      }
-    },
-    cell: ({ getValue }) => {
-      const val = getValue() as string
-      return <span className='text-muted-foreground whitespace-nowrap'>{val ? formatDateTime(val) : '-'}</span>
-    }
-  }
+    dataType: 'datetime',
+    isReadOnly: true,
+    size: 250, // Bisa custom lebar kolom juga!
+    fetchFilterOptions: fetchBooksFilter('last_updated_at')
+  }),
+  createStandardColumn<BookRow>({
+    id: 'last_updated_by',
+    header: 'Last Updated By',
+    dataType: 'text',
+    isReadOnly: true,
+    fetchFilterOptions: fetchBooksFilter('last_updated_by')
+  })
 ]

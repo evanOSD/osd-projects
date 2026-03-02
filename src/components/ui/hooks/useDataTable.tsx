@@ -22,6 +22,8 @@ interface UseDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   updateData?: (rowIndex: number, columnId: string, value: unknown) => void
   defaultHiddenColumns?: Record<string, boolean>
+  // PERBAIKAN: Tambahkan properti ini agar TypeScript tidak marah
+  defaultColumnPinning?: { left?: string[]; right?: string[] }
   columnFilters?: any
   setColumnFilters?: any
   sorting?: SortingState
@@ -36,6 +38,8 @@ export function useDataTable<TData, TValue>({
   columns,
   updateData,
   defaultHiddenColumns = {},
+  // EKSTRAK PROPS-NYA DI SINI, dengan nilai default yang aman
+  defaultColumnPinning = { left: [], right: [] },
   columnFilters,
   setColumnFilters,
   sorting,
@@ -46,7 +50,16 @@ export function useDataTable<TData, TValue>({
 }: UseDataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilter] = useState('')
   const [rowSelection, setRowSelection] = useState({})
-  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({ left: ['select'], right: [] })
+
+  // GABUNGKAN PINNING DARI PROPS DENGAN KOLOM CHECKBOX
+  const initialPinning = useMemo(() => {
+    return {
+      left: ['select', ...(defaultColumnPinning.left || [])],
+      right: defaultColumnPinning.right || []
+    }
+  }, [defaultColumnPinning])
+
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(initialPinning)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(defaultHiddenColumns)
   const [expanded, setExpanded] = useState<ExpandedState>({})
 
@@ -71,7 +84,8 @@ export function useDataTable<TData, TValue>({
             indeterminate={row.getIsSomeSelected()}
             onChange={row.getToggleSelectedHandler()}
           />
-          {row.getCanExpand() && (
+
+          {!!renderSubComponent && row.getCanExpand() && (
             <button
               onClick={row.getToggleExpandedHandler()}
               className='p-0.5 hover:bg-muted rounded cursor-pointer text-muted-foreground'
@@ -108,6 +122,11 @@ export function useDataTable<TData, TValue>({
     data,
     columns: finalColumns,
     defaultColumn: { size: 220, minSize: 100 },
+    initialState: {
+      columnVisibility: defaultHiddenColumns,
+      // PERBAIKAN: Masukkan initialPinning ke dalam state permanen sebagai patokan "Default"
+      columnPinning: initialPinning
+    },
     state: {
       globalFilter,
       columnOrder,
@@ -118,7 +137,7 @@ export function useDataTable<TData, TValue>({
       columnVisibility,
       expanded
     },
-
+    getRowId: (row: any, index) => (row.id ? String(row.id) : String(index)),
     manualSorting: manualSorting,
     manualFiltering,
     columnResizeMode: 'onChange',
@@ -142,7 +161,7 @@ export function useDataTable<TData, TValue>({
 
   const resetOrder = () => {
     setBaseColumnOrder(initialColumnOrder)
-    setColumnPinning({ left: ['select'], right: [] })
+    setColumnPinning(initialPinning)
   }
 
   return { table, globalFilter, setGlobalFilter, columnOrder, resetOrder }

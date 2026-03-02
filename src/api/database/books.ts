@@ -33,7 +33,7 @@ export const booksApi = {
         query = query.order(sort.id, { ascending: !sort.desc })
       })
     } else {
-      query = query.order('global_order', { ascending: true })
+      query = query.order('global_order', { ascending: true }) 
     }
 
     const { data, error } = await query

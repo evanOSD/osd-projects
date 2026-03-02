@@ -3,12 +3,13 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { House, Database } from 'lucide-react'
+import { House, Database, Users } from 'lucide-react'
 import MenuItem from './MenuItem'
 
 const menuItems = [
   { name: 'Dashboard', path: '/home', icon: House },
-  { name: 'Database', path: '/database/books', icon: Database }
+  { name: 'Database', path: '/database/books', icon: Database },
+  { name: 'Users', path: '/users', icon: Users }
 ]
 
 export default function MenuNavigation({ isCollapsed }: { isCollapsed: boolean }) {
