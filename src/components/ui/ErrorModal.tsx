@@ -12,17 +12,17 @@ export default function ErrorModal({ isOpen, message, onClose }: ErrorModalProps
 
   return (
     // Overlay background gelap
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
       {/* Kotak Modal */}
-      <div className='bg-white rounded-xl shadow-2xl w-full max-w-md relative overflow-hidden animate-in fade-in zoom-in duration-200'>
+      <div className='bg-background rounded-xl shadow-2xl w-full max-w-md relative overflow-hidden animate-in fade-in zoom-in duration-200'>
         {/* Header dengan border bawah */}
         <div className='flex justify-between items-center p-4 border-b border-gray-100'>
-          <h3 className='text-lg font-bold text-red-600 flex items-center gap-2'>⚠️ Peringatan</h3>
+          <h3 className='text-lg font-bold text-danger flex items-center gap-2'>⚠️ Peringatan</h3>
 
           {/* Tombol X di sudut kanan atas */}
           <button
             onClick={onClose}
-            className='text-gray-400 hover:text-gray-800 transition-colors p-1 rounded-full hover:bg-gray-100'
+            className='text-danger hover:bg-danger/20 cursor-pointer transition-colors p-1 rounded-full '
             aria-label='Tutup'
           >
             <svg
@@ -44,14 +44,14 @@ export default function ErrorModal({ isOpen, message, onClose }: ErrorModalProps
 
         {/* Isi Pesan Error */}
         <div className='p-6'>
-          <p className='text-gray-700 leading-relaxed'>{message}</p>
+          <p className='text-foreground leading-relaxed'>{message}</p>
         </div>
 
         {/* Footer dengan Tombol Mengerti */}
-        <div className='bg-gray-50 p-4 flex justify-end'>
+        <div className='bg-background p-4 flex justify-end'>
           <button
             onClick={onClose}
-            className='px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+            className='px-6 py-2 bg-danger hover:text-foreground cursor-pointer text-background font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2'
           >
             Mengerti
           </button>

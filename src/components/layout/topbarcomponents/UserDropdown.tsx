@@ -33,9 +33,9 @@ export default function UserDropdown({
         className='flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-border bg-surface transition-all hover:ring-2 hover:ring-primary focus:outline-none'
       >
         {userAvatar ? (
-          <img src={userAvatar} alt={userName} className='h-full w-full object-cover' />
+          <img src={userAvatar} alt={userName} className='h-full w-full object-cover ' />
         ) : (
-          <User size={20} className='text-muted' />
+          <User size={20} className='text-muted-foreground' />
         )}
       </button>
 

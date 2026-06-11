@@ -2,7 +2,7 @@
 
 import type { Metadata } from 'next' // 1. Tambahkan import Metadata
 import { QueryProvider } from '@/components/providers/QueryProvider'
-import './globals.css'
+import '@/app/globals.css'
 import { Inter } from 'next/font/google'
 import NextTopLoader from 'nextjs-toploader'
 import { Toaster } from '@/components/ui/Toaster'

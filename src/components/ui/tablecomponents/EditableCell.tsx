@@ -33,7 +33,11 @@ export function EditableCell<TData, TValue>({
   const [isFocused, setIsFocused] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  useEffect(() => setValue(initialValue), [initialValue])
+  useEffect(() => {
+    if (!isFocused) {
+      setValue(initialValue)
+    }
+  }, [initialValue, isFocused])
 
   const handleSave = () => {
     if (value !== initialValue) {

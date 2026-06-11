@@ -1,107 +1,156 @@
-@import "tailwindcss";
+/* src/app/globals.css */
+
+@import 'tailwindcss';
 @config "../../tailwind.config.ts";
 
 @layer base {
-  /* TEMA LIGHT MODE (FULL PASTEL)             */
+  /*
+    PedalMonk design tokens
+    - Primary follows the blue/cyan family from the logo.
+    - Secondary keeps the pink accent used by the brand direction.
+    - Muted is a quiet surface color; muted-foreground is readable helper text.
+  */
   :root {
-    --bg-start: 210 20% 99%;
-    --bg-end: 210 20% 99%;
-    --foreground: 222 47% 11%;
+    color-scheme: light;
+
+    --bg-start: 210 36% 98%;
+    --bg-end: 195 42% 96%;
+    --foreground: 222 38% 12%;
 
     --surface: 0 0% 100%;
-    --surface-foreground: 222 47% 11%;
+    --surface-foreground: 222 38% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 38% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 38% 12%;
 
-    /* PRIMARY: Pastel Cyan */
-    --primary: 189 100% 45%; /* Saturation 100%, Lightness 40% (Warna tebal) */
-    --primary-hover: 189 100% 32%; /* Hover sedikit lebih gelap */
-    --primary-foreground: 0 0% 100%; /* Karena primary sekarang gelap, teks di atasnya WAJIB putih */
+    --primary: 195 90% 42%;
+    --primary-hover: 195 92% 34%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 202 100% 90%;
+    --primary-soft-foreground: 201 78% 24%;
 
-    /* SECONDARY: Pastel Lilac */
-    --secondary: 270 40% 95%;
-    --secondary-hover: 270 40% 90%;
-    --secondary-foreground: 270 60% 20%;
+    --secondary: 318 75% 54%;
+    --secondary-hover: 318 78% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-soft: 322 100% 93%;
+    --secondary-soft-foreground: 322 72% 32%;
 
-    /* Muted & Accent */
-    --muted: 210 10% 40%;
-    --muted-foreground: 210 10% 55%;
-    --accent: 180 60% 95%;
-    --accent-foreground: 180 90% 15%;
+    --muted: 214 30% 94%;
+    --muted-hover: 214 26% 90%;
+    --muted-foreground: 215 16% 42%;
+    --subtle: 214 35% 97%;
+    --subtle-foreground: 216 18% 35%;
 
-    --success: 120 50% 85%;
-    --success-hover: 120 50% 75%;
-    --success-foreground: 120 60% 20%;
+    --accent: 190 64% 92%;
+    --accent-hover: 190 58% 87%;
+    --accent-foreground: 194 80% 24%;
 
-    --warning: 40 80% 85%;
-    --warning-hover: 40 80% 75%;
-    --warning-foreground: 40 80% 20%;
+    --success: 145 66% 36%;
+    --success-hover: 145 68% 30%;
+    --success-foreground: 146 76% 18%;
+    --success-soft: 145 62% 92%;
 
-    /* DANGER: Merah Solid yang tegas dan kontras */
-    --danger: 348 83% 47%; 
-    --danger-hover: 348 83% 40%;
+    --warning: 36 92% 47%;
+    --warning-hover: 34 90% 40%;
+    --warning-foreground: 31 90% 19%;
+    --warning-soft: 42 100% 92%;
+
+    --danger: 347 78% 48%;
+    --danger-hover: 347 82% 40%;
     --danger-foreground: 0 0% 100%;
+    --danger-soft: 347 88% 94%;
 
-    --info: 210 70% 85%;
-    --info-hover: 210 70% 75%;
-    --info-foreground: 210 80% 20%;
+    --info: 204 76% 43%;
+    --info-hover: 204 82% 35%;
+    --info-foreground: 205 82% 22%;
+    --info-soft: 205 100% 93%;
 
-    --border: 220 20% 90%;
-    --ring: 180 60% 75%;
+    --border: 214 24% 86%;
+    --input: 214 22% 82%;
+    --ring: 195 88% 42%;
+    --overlay: 222 32% 10%;
+    --shadow-color: 220 45% 20%;
+    --radius: 0.75rem;
   }
 
-  /* TEMA DARK MODE (CYBERPUNK FUTURISTIC)     */
   .dark {
-    --bg-start: 230 60% 10%;
-    --bg-end: 280 50% 5%;
-    --foreground: 210 100% 95%;
+    color-scheme: dark;
 
-    --surface: 230 50% 15%;
-    --surface-foreground: 210 100% 95%;
+    --bg-start: 228 44% 8%;
+    --bg-end: 278 42% 7%;
+    --foreground: 210 32% 92%;
 
-    /* PRIMARY: Neon Cyber Cyan */
-    --primary: 189 100% 50%; /* Saturation mentok 100% */
-    --primary-hover: 189 100% 60%; /* Hover sedikit lebih terang agar efek 'glowing' terasa */
-    --primary-foreground: 189 100% 5%; /* Teks nyaris hitam agar kontras dengan neon */
+    --surface: 228 30% 13%;
+    --surface-foreground: 210 32% 92%;
+    --card: 228 28% 15%;
+    --card-foreground: 210 32% 92%;
+    --popover: 228 30% 12%;
+    --popover-foreground: 210 32% 92%;
 
-    /* SECONDARY: Neon Magenta */
-    --secondary: 310 100% 60%;
-    --secondary-hover: 310 100% 70%;
-    --secondary-foreground: 0 0% 100%;
+    --primary: 193 100% 66%;
+    --primary-hover: 193 100% 74%;
+    --primary-foreground: 224 48% 9%;
+    --primary-soft: 194 74% 20%;
+    --primary-soft-foreground: 192 100% 82%;
 
-    /* Muted & Accent di Dark Mode */
-    --muted: 215 20% 65%;
-    --muted-foreground: 215 20% 45%;
-    --accent: 190 100% 15%;
-    --accent-foreground: 190 100% 50%;
+    --secondary: 318 92% 72%;
+    --secondary-hover: 318 100% 80%;
+    --secondary-foreground: 225 45% 9%;
+    --secondary-soft: 318 48% 22%;
+    --secondary-soft-foreground: 318 100% 86%;
 
-    --success: 150 100% 50%;
-    --success-hover: 150 100% 60%;
-    --success-foreground: 150 100% 5%;
+    --muted: 226 24% 21%;
+    --muted-hover: 226 22% 27%;
+    --muted-foreground: 216 22% 76%;
+    --subtle: 226 25% 16%;
+    --subtle-foreground: 216 20% 82%;
 
-    --warning: 60 100% 50%;
-    --warning-hover: 60 100% 60%;
-    --warning-foreground: 60 100% 5%;
+    --accent: 191 55% 19%;
+    --accent-hover: 191 56% 25%;
+    --accent-foreground: 190 100% 83%;
 
-    /* DANGER: Merah Neon */
-    --danger: 350 100% 60%; 
-    --danger-hover: 350 100% 70%;
+    --success: 150 78% 50%;
+    --success-hover: 150 88% 60%;
+    --success-foreground: 151 86% 86%;
+    --success-soft: 150 44% 18%;
+
+    --warning: 43 96% 58%;
+    --warning-hover: 43 100% 66%;
+    --warning-foreground: 42 100% 86%;
+    --warning-soft: 42 52% 20%;
+
+    --danger: 348 92% 66%;
+    --danger-hover: 348 100% 74%;
     --danger-foreground: 0 0% 100%;
+    --danger-soft: 348 44% 20%;
 
-    --info: 210 100% 60%;
-    --info-hover: 210 100% 70%;
-    --info-foreground: 0 0% 100%;
+    --info: 211 100% 70%;
+    --info-hover: 211 100% 78%;
+    --info-foreground: 211 100% 88%;
+    --info-soft: 211 50% 21%;
 
-    --border: 230 50% 30%;
-    --ring: 190 100% 50%;
+    --border: 226 22% 29%;
+    --input: 226 22% 27%;
+    --ring: 193 100% 66%;
+    --overlay: 225 45% 3%;
+    --shadow-color: 220 80% 2%;
   }
 }
 
 /* ========================================= */
 /* OTOMATISASI GLOBAL & TAG HTML SEMANTIK    */
 @layer base {
-  * { 
-    border-color: hsl(var(--border)); 
+  * {
+    border-color: hsl(var(--border));
   }
-  
+
+  html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     background-image: linear-gradient(to bottom right, hsl(var(--bg-start)), hsl(var(--bg-end)));
     color: hsl(var(--foreground));
@@ -109,47 +158,170 @@
     background-attachment: fixed;
   }
 
-  /* 1. Standarisasi Bold (Tebal) */
-  strong, b {
+  ::selection {
+    background: hsl(var(--primary) / 0.24);
+    color: hsl(var(--foreground));
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  .dark :focus-visible {
+    outline-color: hsl(var(--ring) / 0.86);
+  }
+
+  strong,
+  b {
     @apply font-bold text-foreground;
   }
 
-  /* 2. Standarisasi Italic (Miring) */
-  em, i {
+  em,
+  i {
     @apply italic text-foreground/90;
   }
 
-  /* 3. Standarisasi Underline (Garis Bawah) */
   u {
     @apply underline decoration-primary underline-offset-4;
   }
 
-  /* 4. Standarisasi Strikethrough (Coret) */
-  del, s {
-    @apply line-through text-muted;
+  del,
+  s {
+    @apply line-through text-muted-foreground;
   }
 
-  /* 5. Standarisasi Mark (Sorotan / Stabilo) */
   mark {
-    @apply bg-warning/30 text-warning-foreground px-1 rounded-sm font-medium;
+    @apply rounded-sm bg-warning/20 px-1 font-medium text-warning-foreground;
   }
 
-  /* 6. Standarisasi Link (Hanya untuk <a> murni) */
   a:not([class]) {
     @apply text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary transition-colors;
+  }
+
+  input,
+  textarea,
+  select {
+    color: hsl(var(--foreground));
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--muted-foreground) / 0.72);
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: hsl(var(--muted-foreground) / 0.78);
+  }
+
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  * {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.45) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.36);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.58);
+    background-clip: content-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.42);
+    border-radius: 999px;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.48);
   }
 }
 
 /* ========================================= */
 /* ANIMASI GLOBAL                            */
 @keyframes tooltip-slide-fade {
-  0% { opacity: 0; transform: translate(-10px, -50%); }
-  100% { opacity: 1; transform: translate(0, -50%); }
+  0% {
+    opacity: 0;
+    transform: translate(-10px, -50%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
 }
-.animate-tooltip { animation: tooltip-slide-fade 0.2s ease-out forwards; }
+.animate-tooltip {
+  animation: tooltip-slide-fade 0.2s ease-out forwards;
+}
 
 @keyframes dropdown-slide-down {
-  0% { opacity: 0; transform: translateY(-10px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.animate-dropdown { animation: dropdown-slide-down 0.2s ease-out forwards; }
+.animate-dropdown {
+  animation: dropdown-slide-down 0.2s ease-out forwards;
+}
+
+/* Modal backdrop fade-in and card slide-down animations */
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-slide-down-in {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-backdrop-in {
+  animation: modal-backdrop-in 0.2s ease-out forwards;
+}
+
+.animate-modal-slide-down-in {
+  animation: modal-slide-down-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

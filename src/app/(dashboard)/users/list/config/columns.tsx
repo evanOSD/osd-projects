@@ -21,7 +21,7 @@ export const userColumns: ColumnDef<UserRow>[] = [
     dataType: 'text',
     size: 250,
     isPinned: true,
-    isReadOnly: true, // Sebaiknya readonly karena nama ditarik dari Google
+    isReadOnly: true,
     fetchFilterOptions: fetchUsersFilter('user_name')
   }),
   createStandardColumn<UserRow>({
@@ -31,12 +31,12 @@ export const userColumns: ColumnDef<UserRow>[] = [
     size: 250,
     isPinned: true,
     isCopyable: true,
-    isReadOnly: true,
+    isReadOnly: false,
     fetchFilterOptions: fetchUsersFilter('email')
   }),
   createStandardColumn<UserRow>({
     id: 'role',
-    header: 'Role Akses',
+    header: 'Role',
     dataType: 'text',
     size: 150,
     dropdownOptions: ['Staff', 'Consultant', 'Facilitator', 'MTT', 'Guest', 'Unknown'],
@@ -46,13 +46,14 @@ export const userColumns: ColumnDef<UserRow>[] = [
     id: 'is_active',
     header: 'Aktif?',
     dataType: 'boolean',
-    size: 100,
+    size: 150,
     fetchFilterOptions: fetchUsersFilter('is_active')
   }),
   createStandardColumn<UserRow>({
     id: 'phone',
     header: 'Nomor HP',
     dataType: 'text',
+    isCopyable: true,
     size: 180,
     fetchFilterOptions: fetchUsersFilter('phone')
   }),
@@ -60,7 +61,7 @@ export const userColumns: ColumnDef<UserRow>[] = [
     id: 'provider_type',
     header: 'Tipe Login',
     dataType: 'text',
-    size: 150,
+    size: 190,
     isReadOnly: true,
     fetchFilterOptions: fetchUsersFilter('provider_type')
   }),
@@ -82,7 +83,7 @@ export const userColumns: ColumnDef<UserRow>[] = [
   }),
   createStandardColumn<UserRow>({
     id: 'last_updated_at',
-    header: 'Tgl Diedit',
+    header: 'Last Updated At',
     dataType: 'datetime',
     size: 220,
     isReadOnly: true,
@@ -90,9 +91,9 @@ export const userColumns: ColumnDef<UserRow>[] = [
   }),
   createStandardColumn<UserRow>({
     id: 'last_updated_by',
-    header: 'Diedit Oleh',
+    header: 'Last Updated By',
     dataType: 'text',
-    size: 200,
+    size: 230,
     isReadOnly: true,
     fetchFilterOptions: fetchUsersFilter('last_updated_by')
   }),
@@ -100,15 +101,15 @@ export const userColumns: ColumnDef<UserRow>[] = [
     id: 'providers',
     header: 'Raw Providers',
     dataType: 'jsonb',
-    size: 150,
+    size: 250,
     isReadOnly: true
   }),
   createStandardColumn<UserRow>({
     id: 'user_url_photo_profile',
-    header: 'Foto URL',
+    header: 'URL Foto Profil',
     dataType: 'text',
     isCopyable: true,
     isReadOnly: true,
-    size: 150
+    size: 300
   })
 ]

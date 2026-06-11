@@ -26,7 +26,7 @@ export default function MenuLogo({ isCollapsed, onToggle }: MenuLogoProps) {
         )}
       >
         <div className='relative h-8 w-8 shrink-0 flex items-center justify-center transition-transform group-hover:scale-105'>
-          <Image src='/images/logos/osd-logo.svg' alt='OSD Logo' fill className='object-contain' />
+          <Image src='/images/logos/osd-logo.svg' alt='OSD Logo' fill className='object-contain' priority />
         </div>
 
         {!isCollapsed && (

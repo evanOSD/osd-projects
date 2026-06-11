@@ -34,7 +34,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// Hook kustom agar mudah dipanggil di komponen lain
+// Hook custom agar mudah dipanggil di komponen lain
 export const useError = () => {
   const context = useContext(ErrorContext)
   if (!context) {

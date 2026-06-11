@@ -71,4 +71,4 @@ Mark: Untuk menyoroti teks (seperti pakai stabilo).
 
 Kbd: Untuk instruksi tombol keyboard (misal: "Tekan Enter").
 
-Link: Untuk teks yang bisa diklik.
+Link: Untuk teks yang bisa di klik.

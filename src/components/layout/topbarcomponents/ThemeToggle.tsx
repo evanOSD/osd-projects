@@ -13,16 +13,20 @@ export default function ThemeToggle() {
   useEffect(() => setMounted(true), [])
 
   if (!mounted) {
-    return <div className='h-9 w-9' />
+    return <div className='h-10 w-10 shrink-0' />
   }
 
   return (
     <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className='cursor-pointer rounded-full p-2 text-muted hover:bg-accent hover:text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-ring'
+      className='flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-border bg-surface transition-all hover:ring-2 hover:ring-primary focus:outline-none'
       aria-label='Toggle Dark Mode'
     >
-      {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+      {theme === 'dark' ? (
+        <Sun size={20} className='text-muted-foreground' />
+      ) : (
+        <Moon size={20} className='text-muted-foreground' />
+      )}
     </button>
   )
 }

@@ -1,7 +1,7 @@
 // src/app/(dashboard)/users/config/constants.ts
 
 export const USER_TABLE_CONFIG = {
-  title: 'Manajemen Pengguna (Users)',
+  title: 'Manajemen Pengguna',
   description: 'Pengaturan akses, peran (Role), dan status keanggotaan pengguna OSD.',
   defaultHiddenColumns: {
     id: false,

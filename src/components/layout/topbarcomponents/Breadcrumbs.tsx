@@ -12,7 +12,7 @@ export default function Breadcrumbs() {
   if (segments.length === 0) return null
 
   return (
-    <nav className='flex items-center space-x-1 text-sm text-muted'>
+    <nav className='flex items-center space-x-1 text-sm text-muted-foreground'>
       <Link href='/' className='hover:text-primary transition-colors'>
         <Home size={16} />
       </Link>

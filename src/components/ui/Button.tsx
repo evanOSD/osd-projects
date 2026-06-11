@@ -14,7 +14,7 @@ export default function Button({ className, variant = 'primary', isLoading, chil
     primary: 'bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm',
 
     // Outline menggunakan border standar dan hover accent (sorotan halus)
-    outline: 'border border-border bg-transparent hover:bg-accent text-foreground',
+    outline: 'border border-border bg-transparent hover:bg-primary/30 text-foreground',
 
     // Ghost tanpa border, hanya teks dengan hover accent
     ghost: 'bg-transparent hover:bg-accent text-foreground',

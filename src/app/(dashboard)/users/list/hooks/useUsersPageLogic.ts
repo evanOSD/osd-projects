@@ -20,7 +20,7 @@ export function useUsersPageLogic() {
       id: `temp-${Date.now()}`,
       user_name: '',
       email: '',
-      role: 'Users',
+      role: '',
       is_active: false
     }),
 

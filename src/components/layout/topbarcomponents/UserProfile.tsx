@@ -14,7 +14,7 @@ export default function UserProfile({ userName, userEmail }: UserProfileProps) {
     <>
       <div className='border-b border-border px-4 py-3'>
         <p className='text-sm font-semibold text-foreground truncate'>{userName}</p>
-        <p className='text-xs text-muted truncate mt-0.5'>{userEmail}</p>
+        <p className='text-xs text-muted-foreground truncate mt-0.5'>{userEmail}</p>
       </div>
       <button className='flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-sm text-foreground transition-colors hover:bg-primary/20 mt-1'>
         <User size={16} />

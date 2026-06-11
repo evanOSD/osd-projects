@@ -5,10 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 export const createSupabaseFetcher = (tableName: string, columnName: string) => {
   return async () => {
     const supabase = createClient()
-    const { data, error } = await supabase
-      .from(tableName)
-      .select(columnName)
-      .not(columnName, 'is', null)
+    const { data, error } = await supabase.from(tableName).select(columnName).not(columnName, 'is', null)
 
     if (error || !data) return []
 

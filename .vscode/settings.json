@@ -45,7 +45,29 @@
   "files.insertFinalNewline": true,
   "editor.linkedEditing": true,
   "typescript.tsdk": "node_modules/typescript/lib",
+  "cSpell.language": "id, en",
   "cSpell.words": [
-    "iconify"
+    "ANON",
+    "apexcharts",
+    "argb",
+    "exceljs",
+    "fkey",
+    "iconify",
+    "monthpicker",
+    "osdproject",
+    "passsages",
+    "planning",
+    "Postgrest",
+    "programmer",
+    "stabilo",
+    "supabase",
+    "tablecomponents",
+    "timestamppicker",
+    "Topbar",
+    "topbarcomponents",
+    "toploader",
+    "Typography",
+    "unauthorized",
+    "verticalnavbarcomponents"
   ]
 }

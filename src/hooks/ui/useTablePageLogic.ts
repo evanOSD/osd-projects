@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef } from 'react'
 import { ColumnFiltersState, SortingState, ColumnDef } from '@tanstack/react-table'
 import toast from 'react-hot-toast'
-import { useAuth } from '@/providers/AuthProvider' // <--- IMPORT HOOK AUTH
+import { useAuth } from '@/providers/AuthProvider'
 
 export interface UseTablePageLogicProps<TRow, TInsert> {
   columns: ColumnDef<TRow, any>[]
@@ -80,7 +80,6 @@ export function useTablePageLogic<TRow extends { id?: any }, TInsert>({
       // Jika masih baris sementara, cukup ubah state lokal ditambah audit data
       setNewRows(prev => prev.map(r => (r.id === row.id ? { ...r, ...auditData, [columnId]: value } : r)))
     } else {
-      // Jika baris database beneran, tembak API dengan payload + audit data
       updateMutation.mutate({
         id: String(row.id),
         payload: { ...auditData, [columnId]: value }
@@ -95,7 +94,7 @@ export function useTablePageLogic<TRow extends { id?: any }, TInsert>({
       {
         ...tempRow,
         last_updated_at: new Date().toISOString(),
-        last_updated_by: currentUserName // Boleh tetap currentUserName untuk preview UI sebelum disave
+        last_updated_by: currentUserName // Boleh tetap currentUserName untuk preview UI sebelum di save
       } as Partial<TRow>,
       ...prev
     ])
@@ -104,25 +103,27 @@ export function useTablePageLogic<TRow extends { id?: any }, TInsert>({
   // --- FUNGSI SIMPAN BARIS BARU (INSERT) ---
   const handleSave = async () => {
     if (newRows.length === 0) return
-    toast.loading(`Menyimpan ${newRows.length} baris baru...`, { id: 'save-rows' })
-    try {
-      for (const row of newRows) {
-        // Buang ID temporary 'temp-xxx'
-        const { id, ...payloadToInsert } = row
 
-        // Pastikan audit trail masuk saat insert ke database
-        const finalPayload = {
-          ...payloadToInsert,
-          last_updated_at: new Date().toISOString(),
-          last_updated_by: currentUserId
-        }
-
-        await addMutation.mutateAsync(finalPayload as unknown as TInsert)
+    // Gunakan toast.promise agar loading dan sukses diurus otomatis,
+    // error dibiarkan bocor ke global
+    const savePromises = newRows.map(row => {
+      const { id, ...payloadToInsert } = row
+      const finalPayload = {
+        ...payloadToInsert,
+        last_updated_at: new Date().toISOString(),
+        last_updated_by: currentUserId
       }
+      return addMutation.mutateAsync(finalPayload as unknown as TInsert)
+    })
+
+    try {
+      toast.loading(`Menyimpan ${newRows.length} baris baru...`, { id: 'save-rows' })
+      await Promise.all(savePromises)
+
       setNewRows([])
       toast.success('Semua baris baru berhasil disimpan!', { id: 'save-rows' })
     } catch (error: any) {
-      toast.error(`Gagal menyimpan: ${error.message}`, { id: 'save-rows' })
+      toast.dismiss('save-rows')
     }
   }
 
@@ -150,15 +151,17 @@ export function useTablePageLogic<TRow extends { id?: any }, TInsert>({
 
   const confirmDeleteRows = async () => {
     if (dbRowsToDelete.length === 0) return
+
     toast.loading(`Menghapus ${dbRowsToDelete.length} baris...`, { id: 'delete-toast' })
     try {
       const dbIds = dbRowsToDelete.map(r => String(r.id))
       await deleteMutation.mutateAsync(dbIds)
+
       toast.success(`${dbRowsToDelete.length} baris berhasil dihapus!`, { id: 'delete-toast' })
       clearSelectionRef.current()
       setDbRowsToDelete([])
     } catch (error: any) {
-      toast.error(`Gagal menghapus: ${error.message}`, { id: 'delete-toast' })
+      toast.dismiss('delete-toast')
     }
   }
 

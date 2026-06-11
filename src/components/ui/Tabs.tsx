@@ -28,7 +28,7 @@ export function PageTabs({ tabs }: { tabs: TabItem[] }) {
                 'whitespace-nowrap pb-3 border-b-2 text-sm font-semibold transition-colors',
                 isActive
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-muted hover:text-foreground hover:border-border'
+                  : 'border-transparent text-foreground hover:text-primary-hover hover:border-primary'
               )}
             >
               {tab.name}

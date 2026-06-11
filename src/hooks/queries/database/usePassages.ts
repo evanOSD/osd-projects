@@ -1,8 +1,8 @@
 // src/hooks/queries/database/usePassages.ts
 
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query"
-import toast from "react-hot-toast"
-import { passagesApi, PassageUpdate, PassageInsert, PassageRow } from "@/api/database/passages"
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+import { passagesApi, PassageUpdate, PassageInsert, PassageRow } from '@/api/database/passages'
 
 export function usePassages(filters: Record<string, string[]> = {}, sorting: any[] = [], pageSize = 1000) {
   return useInfiniteQuery({
@@ -12,7 +12,7 @@ export function usePassages(filters: Record<string, string[]> = {}, sorting: any
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === pageSize ? allPages.length : undefined
     },
-    placeholderData: keepPreviousData, 
+    placeholderData: keepPreviousData
   })
 }
 
@@ -20,8 +20,8 @@ export function usePassageFilterOptions(columnName: keyof PassageRow, enabled: b
   return useQuery({
     queryKey: ['passages', 'filterOptions', columnName],
     queryFn: () => passagesApi.getUniqueColumnValues(columnName),
-    staleTime: 1000 * 60 * 60, 
-    enabled: enabled, 
+    staleTime: 1000 * 60 * 60,
+    enabled: enabled
   })
 }
 
@@ -32,9 +32,9 @@ export function useUpdatePassage() {
     mutationFn: ({ id, payload }: { id: string; payload: PassageUpdate }) => passagesApi.updatePassage(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['passages'] })
-      toast.success("Tersimpan!", { duration: 1500, id: "auto-save-toast" })
+      toast.success('Tersimpan!', { duration: 1500, id: 'auto-save-toast' })
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Gagal menyimpan: ${error.message}`)
     }
   })
@@ -47,9 +47,9 @@ export function useAddPassage() {
     mutationFn: (payload: PassageInsert) => passagesApi.addPassage(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['passages'] })
-      toast.success("Baris baru ditambahkan di paling atas!")
+      toast.success('Baris baru ditambahkan di paling atas!')
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Gagal menambah baris: ${error.message}`)
     }
   })
