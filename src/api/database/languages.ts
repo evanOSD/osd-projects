@@ -84,5 +84,15 @@ export const languagesApi = {
     })
 
     return Array.from(uniqueValues)
+  },
+
+  getAllLanguages: async () => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('languages')
+      .select('*')
+      .order('name_in_ethnologue', { ascending: true })
+    if (error) throw new Error(error.message)
+    return data as LanguageRow[]
   }
 }

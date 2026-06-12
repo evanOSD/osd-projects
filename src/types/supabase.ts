@@ -364,6 +364,7 @@ export type Database = {
           facilitator: string | null
           id: string
           language_id: string
+          language_pseudonym: string | null
           project_id: string
           sub_cluster: string | null
         }
@@ -372,6 +373,7 @@ export type Database = {
           facilitator?: string | null
           id?: string
           language_id: string
+          language_pseudonym?: string | null
           project_id: string
           sub_cluster?: string | null
         }
@@ -380,6 +382,7 @@ export type Database = {
           facilitator?: string | null
           id?: string
           language_id?: string
+          language_pseudonym?: string | null
           project_id?: string
           sub_cluster?: string | null
         }
@@ -400,35 +403,38 @@ export type Database = {
           },
         ]
       }
-      project_managers: {
+      project_members: {
         Row: {
           created_at: string | null
           id: string
           project_id: string | null
+          role: Database["public"]["Enums"]["project_role"]
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
           project_id?: string | null
+          role: Database["public"]["Enums"]["project_role"]
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
           project_id?: string | null
+          role?: Database["public"]["Enums"]["project_role"]
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "project_managers_project_id_fkey"
+            foreignKeyName: "project_members_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "project_managers_user_id_fkey"
+            foreignKeyName: "project_members_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -805,10 +811,9 @@ export type Database = {
       }
       projects: {
         Row: {
-          cluster_leader: string | null
           created_at: string
-          field_coordinator: string | null
           id: string
+          organization_id: string | null
           project_description: string | null
           project_end_date: string | null
           project_name: string
@@ -818,13 +823,12 @@ export type Database = {
             | null
           project_type: Database["public"]["Enums"]["project_type"] | null
           sensitivity: Database["public"]["Enums"]["project_sensitivity"] | null
-          organization_id: string | null
+          short_id: string
         }
         Insert: {
-          cluster_leader?: string | null
           created_at?: string
-          field_coordinator?: string | null
           id?: string
+          organization_id?: string | null
           project_description?: string | null
           project_end_date?: string | null
           project_name: string
@@ -833,14 +837,15 @@ export type Database = {
             | Database["public"]["Enums"]["completion_status"]
             | null
           project_type?: Database["public"]["Enums"]["project_type"] | null
-          sensitivity?: Database["public"]["Enums"]["project_sensitivity"] | null
-          organization_id?: string | null
+          sensitivity?:
+            | Database["public"]["Enums"]["project_sensitivity"]
+            | null
+          short_id: string
         }
         Update: {
-          cluster_leader?: string | null
           created_at?: string
-          field_coordinator?: string | null
           id?: string
+          organization_id?: string | null
           project_description?: string | null
           project_end_date?: string | null
           project_name?: string
@@ -849,8 +854,10 @@ export type Database = {
             | Database["public"]["Enums"]["completion_status"]
             | null
           project_type?: Database["public"]["Enums"]["project_type"] | null
-          sensitivity?: Database["public"]["Enums"]["project_sensitivity"] | null
-          organization_id?: string | null
+          sensitivity?:
+            | Database["public"]["Enums"]["project_sensitivity"]
+            | null
+          short_id?: string
         }
         Relationships: [
           {
@@ -1074,8 +1081,21 @@ export type Database = {
     Enums: {
       completion_status: "not_started" | "on_going" | "completed"
       measurement_type: "outcome" | "goal" | "activity"
-      project_sensitivity: "Level 1 - Low" | "Level 2 - Medium" | "Level 3 - High"
-      project_type: "story" | "passage" | "book" | "Oral Bible Stories" | "Oral Bible Translation"
+      project_role:
+        | "project_manager"
+        | "field_coordinator"
+        | "cluster_leader"
+        | "language_facilitator"
+      project_sensitivity:
+        | "Level 1 - Low"
+        | "Level 2 - Medium"
+        | "Level 3 - High"
+      project_type:
+        | "story"
+        | "passage"
+        | "book"
+        | "Oral Bible Stories"
+        | "Oral Bible Translation"
       step_category: "administration" | "finance" | "translation"
       step_input_type:
         | "date_picker"
@@ -1215,8 +1235,24 @@ export const Constants = {
     Enums: {
       completion_status: ["not_started", "on_going", "completed"],
       measurement_type: ["outcome", "goal", "activity"],
-      project_sensitivity: ["Level 1 - Low", "Level 2 - Medium", "Level 3 - High"],
-      project_type: ["story", "passage", "book", "Oral Bible Stories", "Oral Bible Translation"],
+      project_role: [
+        "project_manager",
+        "field_coordinator",
+        "cluster_leader",
+        "language_facilitator",
+      ],
+      project_sensitivity: [
+        "Level 1 - Low",
+        "Level 2 - Medium",
+        "Level 3 - High",
+      ],
+      project_type: [
+        "story",
+        "passage",
+        "book",
+        "Oral Bible Stories",
+        "Oral Bible Translation",
+      ],
       step_category: ["administration", "finance", "translation"],
       step_input_type: [
         "date_picker",

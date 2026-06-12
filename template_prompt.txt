@@ -1,5 +1,20 @@
 buatkan issue.md yang berisi perencanaan untuk nanti diimplementasikan oleh junior programmer atau ai model yang lebih murah.
 isi dari planning-nya adalah sebagai berikut:
 
+sekarang saya ingin kamu cek dan memberitahu saya apakah Field Coordinator dan Cluster Leader di halaman project info ini perlu dibuatkan pivot tabel juga seperti tabel project_managers atau tidak?
+berikan alasannya
+sebagai konteks, dalam penerjemahan Alkitab, Project Manager biasanya setara dengan Field Coordinator, sedangkan Cluster Leader berada di bawah Field Coordinator, lalu Fasilitator Bahasa berada di bawah Cluster Leader.
+Coba bantu cek schema saya secara keseluruhan apakah schema saya yang sekarang mendukung untuk hierarki seperti yang saya atau tidak?
+saya ingin diskusi dulu dengan cara kamu membuatkan tahapan tahapan, beserta alasan, konsekuensi, kelebihan dan kekurangan pendekatan schema sekarang dibandingkan dengan usulanmu
+
 Buat tahapan-tahapan yang harus dilakukan untuk mengimplementasikan fitur-fitur ini.
 Jelaskan secara detail dengan target junior programmer atau ai model yang lebih murah
+
+
+=========================================================================================
+
+submit issue.md sebagai github issue baru
+
+=========================================================================================
+
+kerjakan github issue : https://github.com/evanOSD/osd-projects/issues/5

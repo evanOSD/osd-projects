@@ -29,6 +29,7 @@ import {
   Moon
 } from 'lucide-react'
 import { useProject } from '@/context/ProjectContext'
+import { useProjectsList } from '@/hooks/queries/database/useProjects'
 import Tooltip from '@/components/ui/Tooltip'
 import { cn } from '@/lib/utils'
 
@@ -36,6 +37,7 @@ export default function VerticalNavbar({ defaultCollapsed = false }: { defaultCo
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
   const pathname = usePathname()
   const { selectedProject } = useProject()
+  const { data: projects = [] } = useProjectsList()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -63,23 +65,25 @@ export default function VerticalNavbar({ defaultCollapsed = false }: { defaultCo
     { name: 'Scripture', path: '/database/books', icon: Map }
   ]
 
+  const activeProject = projects.find(p => p.project_name === selectedProject)
+  const shortId = activeProject?.short_id
+
   const projectManagementLinks =
-    selectedProject === 'Operation Snap Dragon - Indonesia'
+    selectedProject === 'Operation Snap Dragon - Indonesia' || !shortId
       ? [
           { name: 'Projects', path: '/projects', icon: CheckSquare },
           { name: 'Goals & Analytics', path: '/placeholder?page=Goals %26 Analytics', icon: TrendingUp },
           { name: 'Key Documents', path: '/placeholder?page=Key Documents', icon: FileText },
-          { name: 'Project Reports', path: '/project-reports', icon: MessageSquare },
           { name: 'Workforce', path: '/users', icon: Users },
           { name: 'Partners', path: '/placeholder?page=Partners', icon: Handshake },
           { name: 'Portfolios', path: '/placeholder?page=Portfolios', icon: Briefcase }
         ]
       : [
-          { name: 'Plan & Progress', path: '/plan-progress', icon: CheckSquare },
-          { name: 'Team Reports', path: '/placeholder?page=Team Reports', icon: Send },
-          { name: 'Project Reports', path: '/project-reports', icon: MessageSquare },
-          { name: 'Workforce', path: '/placeholder?page=Workforce', icon: Users },
-          { name: 'Partners', path: '/placeholder?page=Partners', icon: Handshake },
+          { name: 'Projects', path: '/projects', icon: CheckSquare },
+          { name: 'Info Proyek', path: `/projects/${shortId}/info`, icon: House },
+          { name: 'Plan (Rencana)', path: `/projects/${shortId}/plan`, icon: CheckSquare },
+          { name: 'Progress (Kuartal)', path: `/projects/${shortId}/progress`, icon: MessageSquare },
+          { name: 'Workforce', path: '/users', icon: Users },
           { name: 'Key Documents', path: '/placeholder?page=Key Documents', icon: FileText }
         ]
 

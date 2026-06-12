@@ -7,15 +7,16 @@ export interface ModalProps {
   title: string
   children: React.ReactNode
   footer?: React.ReactNode
+  className?: string
 }
 
-export const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, title, children, footer, className = 'max-w-lg' }: ModalProps) => {
   if (!isOpen) return null
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 dark:bg-white/20 animate-backdrop-in'>
       <div
-        className='relative w-full max-w-lg bg-[hsl(var(--surface))] rounded-(--radius) border border-[hsl(var(--border))] shadow-xl shadow-[hsl(var(--shadow-color))/0.1] animate-modal-slide-down-in'
+        className={`relative w-full bg-[hsl(var(--surface))] rounded-(--radius) border border-[hsl(var(--border))] shadow-xl shadow-[hsl(var(--shadow-color))/0.1] animate-modal-slide-down-in ${className}`}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -42,3 +43,4 @@ export const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) 
     </div>
   )
 }
+

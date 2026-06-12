@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useState, useRef, useEffect } from 'react'
 import { ChevronDown, Check, X } from 'lucide-react'
+import { PopoverCalculator } from '@/components/ui/tablecomponents/PopoverCalculator'
 
 export interface SelectOption {
   label: string
@@ -18,7 +18,7 @@ export interface SelectProps {
   onChange?: (value: string | number | '') => void
   className?: string
   disabled?: boolean
-  isClearable?: boolean // <-- Tambahan properti baru
+  isClearable?: boolean
 }
 
 export const Select = ({
@@ -32,64 +32,12 @@ export const Select = ({
   onChange,
   className = '',
   disabled = false,
-  isClearable = false // <-- Default false
+  isClearable = false
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [internalValue, setInternalValue] = useState<string | number | undefined>(value)
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
 
-  const containerRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  // Fungsi untuk mengkalkulasi posisi dropdown
-  const updateDropdownPosition = useCallback(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect()
-      // Hitung posisi dropdown berdasarkan posisi tombol saat ini
-      setDropdownStyle({
-        position: 'fixed',
-        top: `${rect.bottom + window.scrollY + 6}px`, // 6px jarak dari tombol
-        left: `${rect.left + window.scrollX}px`,
-        width: `${rect.width}px`,
-        zIndex: 9999 // Z-index tinggi agar selalu di atas
-      })
-    }
-  }, [isOpen])
-
-  // Efek untuk update posisi saat resize/scroll
-  useEffect(() => {
-    if (isOpen) {
-      updateDropdownPosition()
-      window.addEventListener('scroll', updateDropdownPosition, true)
-      window.addEventListener('resize', updateDropdownPosition)
-
-      return () => {
-        window.removeEventListener('scroll', updateDropdownPosition, true)
-        window.removeEventListener('resize', updateDropdownPosition)
-      }
-    }
-  }, [isOpen, updateDropdownPosition])
-
-  // Efek untuk menutup dropdown ketika click di luar (tombol ATAU menu)
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      const isClickInsideContainer = containerRef.current?.contains(event.target as Node)
-      const isClickInsideDropdown = dropdownRef.current?.contains(event.target as Node)
-
-      if (!isClickInsideContainer && !isClickInsideDropdown) {
-        setIsOpen(false)
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleOutsideClick)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick)
-    }
-  }, [isOpen])
 
   useEffect(() => {
     if (value !== undefined) {
@@ -103,52 +51,17 @@ export const Select = ({
     setIsOpen(false)
   }
 
-  // Fungsi untuk menangani klik tombol hapus "X"
   const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation() // Mencegah dropdown terbuka saat menghapus
+    e.stopPropagation()
     setInternalValue(undefined)
-    onChange?.('') // Kembalikan string kosong sebagai tanda terhapus
+    onChange?.('')
     setIsOpen(false)
   }
 
   const selectedOption = options.find(opt => opt.value === internalValue)
 
-  // Render konten dropdown
-  const dropdownContent = isOpen && (
-    <div
-      ref={dropdownRef}
-      style={dropdownStyle}
-      className='bg-[hsl(var(--popover))] border border-[hsl(var(--border))] rounded-(--radius) shadow-[0_10px_30px_-10px_hsl(var(--shadow-color)/0.2)] animate-dropdown overflow-hidden'
-    >
-      <ul className='max-h-60 overflow-y-auto custom-scrollbar p-1' role='listbox'>
-        {options.length === 0 ? (
-          <li className='px-3 py-2 text-sm text-muted-foreground text-center cursor-default'>Tidak ada opsi</li>
-        ) : (
-          options.map(option => (
-            <li
-              key={option.value}
-              role='option'
-              aria-selected={internalValue === option.value}
-              onClick={() => handleSelect(option.value)}
-              className={`flex items-center justify-between px-3 py-2 my-0.5 text-sm rounded-[calc(var(--radius)-4px)] cursor-pointer transition-colors duration-150
-                ${
-                  internalValue === option.value
-                    ? 'bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary-soft-foreground))] font-medium'
-                    : 'text-[hsl(var(--popover-foreground))] hover:bg-[hsl(var(--muted))] hover:text-foreground'
-                }
-              `}
-            >
-              <span className='truncate'>{option.label}</span>
-              {internalValue === option.value && <Check className='shrink-0 w-4 h-4 text-primary ml-2' />}
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
-  )
-
   return (
-    <div className={`w-full ${className}`} ref={containerRef}>
+    <div className={`w-full ${className}`}>
       {label && (
         <label htmlFor={id} className='block mb-1.5 text-sm font-medium text-foreground'>
           {label}
@@ -182,7 +95,6 @@ export const Select = ({
           </span>
 
           <div className='flex items-center shrink-0 ml-1'>
-            {/* Tombol Hapus (Clear) */}
             {isClearable && selectedOption && !disabled && (
               <div
                 onClick={handleClear}
@@ -193,15 +105,45 @@ export const Select = ({
               </div>
             )}
 
-            {/* Ikon Dropdown Bawaan */}
             <ChevronDown
               className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             />
           </div>
         </button>
 
-        {/* Gunakan createPortal untuk render dropdown di body */}
-        {isOpen && typeof document !== 'undefined' && createPortal(dropdownContent, document.body)}
+        <PopoverCalculator
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          triggerRef={buttonRef}
+          matchTriggerWidth={true}
+        >
+          <div className='bg-[hsl(var(--popover))] border border-[hsl(var(--border))] rounded-(--radius) shadow-[0_10px_30px_-10px_hsl(var(--shadow-color)/0.2)] animate-dropdown overflow-hidden'>
+            <ul className='max-h-60 overflow-y-auto custom-scrollbar p-1' role='listbox'>
+              {options.length === 0 ? (
+                <li className='px-3 py-2 text-sm text-muted-foreground text-center cursor-default'>Tidak ada opsi</li>
+              ) : (
+                options.map(option => (
+                  <li
+                    key={option.value}
+                    role='option'
+                    aria-selected={internalValue === option.value}
+                    onClick={() => handleSelect(option.value)}
+                    className={`flex items-center justify-between px-3 py-2 my-0.5 text-sm rounded-[calc(var(--radius)-4px)] cursor-pointer transition-colors duration-150
+                      ${
+                        internalValue === option.value
+                          ? 'bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary-soft-foreground))] font-medium'
+                          : 'text-[hsl(var(--popover-foreground))] hover:bg-[hsl(var(--muted))] hover:text-foreground'
+                      }
+                    `}
+                  >
+                    <span className='truncate'>{option.label}</span>
+                    {internalValue === option.value && <Check className='shrink-0 w-4 h-4 text-primary ml-2' />}
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+        </PopoverCalculator>
       </div>
 
       {error && <p className='mt-1.5 text-sm text-[hsl(var(--danger))] animate-dropdown'>{error}</p>}

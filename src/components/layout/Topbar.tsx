@@ -3,32 +3,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/providers/AuthProvider'
 import { useProject } from '@/context/ProjectContext'
+import { useProjectsList } from '@/hooks/queries/database/useProjects'
+import { useRouter } from 'next/navigation'
 import UserDropdown from '@/components/layout/topbarcomponents/UserDropdown'
 import ThemeToggle from '@/components/layout/topbarcomponents/ThemeToggle'
 import { Search, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const ALL_PROJECTS = [
-  '5H2I - Hibun',
-  '5H2I - Jangkang',
-  '5R2I - Keninjal',
-  '5R2I - Seberuang',
-  '5R2I - Tabun',
-  'Baselo - Be Neh',
-  'Baselo - Benyadu',
-  'Betola3',
-  'Bilo',
-  'Firman Tuhan dalam bahasa Kereho, Tamuan, dan Mentuobi',
-  'Gereja Ramah Anak - GERAK',
-  'Tunas 1 Papua',
-  'Tunas 2 Papua',
-  'Tunas 3 Papua',
-  'Tunas Cluster (Papua Selatan)'
-]
-
 export default function Topbar() {
   const { user, logout } = useAuth()
   const { selectedProject, setSelectedProject } = useProject()
+  const { data: projects = [] } = useProjectsList()
+  const router = useRouter()
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -50,13 +36,21 @@ export default function Topbar() {
   const userEmail = user?.email ?? 'Email tidak ditemukan'
   const userAvatar = user?.user_metadata?.avatar_url ?? null
 
-  const selectProject = (project: string) => {
-    setSelectedProject(project)
+  const selectProject = (projectName: string) => {
+    setSelectedProject(projectName)
     setIsDropdownOpen(false)
     setSearchQuery('')
+    const proj = projects.find(p => p.project_name === projectName)
+    if (proj) {
+      router.push(`/projects/${proj.short_id}/info`)
+    } else {
+      router.push('/projects')
+    }
   }
 
-  const filteredProjects = ALL_PROJECTS.filter(p => p.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredProjects = projects.filter(p =>
+    p.project_name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   return (
     <header className='sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between bg-background px-6 text-foreground shadow-sm transition-colors'>
@@ -111,17 +105,17 @@ export default function Topbar() {
                 ) : (
                   filteredProjects.map(p => (
                     <div
-                      key={p}
-                      onClick={() => selectProject(p)}
+                      key={p.id}
+                      onClick={() => selectProject(p.project_name)}
                       className={cn(
                         'rounded px-2 py-1.5 text-xs font-semibold cursor-pointer block transition-colors truncate',
-                        selectedProject === p
+                        selectedProject === p.project_name
                           ? 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-bold'
                           : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--primary))]/10 hover:text-[hsl(var(--primary))]'
                       )}
-                      title={p}
+                      title={p.project_name}
                     >
-                      {p}
+                      {p.project_name}
                     </div>
                   ))
                 )}

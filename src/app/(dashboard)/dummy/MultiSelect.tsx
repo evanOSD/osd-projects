@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { ChevronDown, Check, X } from 'lucide-react'
+import { PopoverCalculator } from '@/components/ui/tablecomponents/PopoverCalculator'
 
 export interface MultiSelectOption {
   label: string
@@ -36,59 +36,41 @@ export const MultiSelect = ({
 }: MultiSelectProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [internalValue, setInternalValue] = useState<(string | number)[]>(value)
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeIndex, setActiveIndex] = useState<number>(0)
 
-  const containerRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Fungsi untuk mengkalkulasi posisi dropdown
-  const updateDropdownPosition = useCallback(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect()
-      setDropdownStyle({
-        position: 'fixed',
-        top: `${rect.bottom + window.scrollY + 6}px`,
-        left: `${rect.left + window.scrollX}px`,
-        width: `${rect.width}px`,
-        zIndex: 9999
-      })
+  // Clear search query and activeIndex when dropdown closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery('')
+      setActiveIndex(0)
     }
   }, [isOpen])
 
-  // Update posisi saat resize/scroll
-  useEffect(() => {
-    if (isOpen) {
-      updateDropdownPosition()
-      window.addEventListener('scroll', updateDropdownPosition, true)
-      window.addEventListener('resize', updateDropdownPosition)
+  // Filter opsi berdasarkan kata kunci pencarian
+  const filteredOptions = useMemo(() => {
+    return options.filter(opt =>
+      opt.label.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [options, searchQuery])
 
-      return () => {
-        window.removeEventListener('scroll', updateDropdownPosition, true)
-        window.removeEventListener('resize', updateDropdownPosition)
+  // Reset activeIndex whenever filteredOptions length changes
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [filteredOptions.length])
+
+  // Scroll active item into view
+  useEffect(() => {
+    if (isOpen && activeIndex >= 0 && dropdownRef.current) {
+      const activeEl = dropdownRef.current.querySelector('[aria-current="true"]') as HTMLElement
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: 'nearest' })
       }
     }
-  }, [isOpen, updateDropdownPosition])
-
-  // Menutup dropdown saat klik di luar
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      const isClickInsideContainer = containerRef.current?.contains(event.target as Node)
-      const isClickInsideDropdown = dropdownRef.current?.contains(event.target as Node)
-
-      if (!isClickInsideContainer && !isClickInsideDropdown) {
-        setIsOpen(false)
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleOutsideClick)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick)
-    }
-  }, [isOpen])
+  }, [activeIndex, isOpen])
 
   // Sinkronisasi dengan props value
   useEffect(() => {
@@ -101,15 +83,12 @@ export const MultiSelect = ({
   const handleSelect = (val: string | number) => {
     let newValue: (string | number)[]
     if (internalValue.includes(val)) {
-      // Jika sudah ada, hapus dari array (deselect)
       newValue = internalValue.filter(v => v !== val)
     } else {
-      // Jika belum ada, tambahkan ke array
       newValue = [...internalValue, val]
     }
     setInternalValue(newValue)
     onChange?.(newValue)
-    // Tidak memanggil setIsOpen(false) di sini agar pengguna bisa memilih opsi lain sekaligus
   }
 
   // Menangani klik "X" pada satu chip/badge
@@ -128,48 +107,57 @@ export const MultiSelect = ({
     setIsOpen(false)
   }
 
+  // Handle keyboard keydown inside input search
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen) return
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setActiveIndex(prev => (filteredOptions.length > 0 ? (prev + 1) % filteredOptions.length : 0))
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setActiveIndex(prev => (filteredOptions.length > 0 ? (prev - 1 + filteredOptions.length) % filteredOptions.length : 0))
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (filteredOptions.length > 0 && activeIndex >= 0 && activeIndex < filteredOptions.length) {
+          handleSelect(filteredOptions[activeIndex].value)
+        }
+        break
+      case 'Escape':
+        e.preventDefault()
+        setIsOpen(false)
+        buttonRef.current?.focus()
+        break
+      default:
+        break
+    }
+  }
+
+  // Handle keyboard keydown on trigger button
+  const handleTriggerKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (disabled) return
+
+    if (!isOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        setIsOpen(true)
+      }
+    } else {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setIsOpen(false)
+      }
+    }
+  }
+
   // Mendapatkan semua objek opsi yang sedang terpilih
   const selectedOptions = options.filter(opt => internalValue.includes(opt.value))
 
-  // Render konten dropdown
-  const dropdownContent = isOpen && (
-    <div
-      ref={dropdownRef}
-      style={dropdownStyle}
-      className='bg-[hsl(var(--popover))] border border-[hsl(var(--border))] rounded-(--radius) shadow-[0_10px_30px_-10px_hsl(var(--shadow-color)/0.2)] animate-dropdown overflow-hidden'
-    >
-      <ul className='max-h-60 overflow-y-auto custom-scrollbar p-1' role='listbox'>
-        {options.length === 0 ? (
-          <li className='px-3 py-2 text-sm text-muted-foreground text-center cursor-default'>Tidak ada opsi</li>
-        ) : (
-          options.map(option => {
-            const isSelected = internalValue.includes(option.value)
-            return (
-              <li
-                key={option.value}
-                role='option'
-                aria-selected={isSelected}
-                onClick={() => handleSelect(option.value)}
-                className={`flex items-center justify-between px-3 py-2 my-0.5 text-sm rounded-[calc(var(--radius)-4px)] cursor-pointer transition-colors duration-150
-                  ${
-                    isSelected
-                      ? 'bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary-soft-foreground))] font-medium'
-                      : 'text-[hsl(var(--popover-foreground))] hover:bg-[hsl(var(--muted))] hover:text-foreground'
-                  }
-                `}
-              >
-                <span className='truncate'>{option.label}</span>
-                {isSelected && <Check className='shrink-0 w-4 h-4 text-primary ml-2' />}
-              </li>
-            )
-          })
-        )}
-      </ul>
-    </div>
-  )
-
   return (
-    <div className={`w-full ${className}`} ref={containerRef}>
+    <div className={`w-full ${className}`}>
       {label && (
         <label htmlFor={id} className='block mb-1.5 text-sm font-medium text-foreground'>
           {label}
@@ -183,6 +171,7 @@ export const MultiSelect = ({
           id={id}
           disabled={disabled}
           onClick={() => !disabled && setIsOpen(!isOpen)}
+          onKeyDown={handleTriggerKeyDown}
           className={`flex items-center justify-between w-full pl-2 pr-2 py-1.5 min-h-11 bg-[hsl(var(--surface))] border rounded-(--radius) text-sm transition-all duration-200 cursor-pointer
             focus:outline-none focus:ring-2 focus:ring-offset-0
             ${
@@ -206,7 +195,7 @@ export const MultiSelect = ({
               selectedOptions.map(opt => (
                 <span
                   key={opt.value}
-                  onClick={e => e.stopPropagation()} // Mencegah klik badge membuka/menutup dropdown
+                  onClick={e => e.stopPropagation()}
                   className='inline-flex items-center gap-1 px-2 py-1 rounded-[calc(var(--radius)-4px)] bg-[hsl(var(--muted))] text-foreground text-xs font-medium border border-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--border))]'
                 >
                   {opt.label}
@@ -239,8 +228,62 @@ export const MultiSelect = ({
           </div>
         </button>
 
-        {/* Gunakan createPortal untuk render dropdown di body */}
-        {isOpen && typeof document !== 'undefined' && createPortal(dropdownContent, document.body)}
+        <PopoverCalculator
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          triggerRef={buttonRef}
+          matchTriggerWidth={true}
+        >
+          <div
+            ref={dropdownRef}
+            className='bg-[hsl(var(--popover))] border border-[hsl(var(--border))] rounded-(--radius) shadow-[0_10px_30px_-10px_hsl(var(--shadow-color)/0.2)] animate-dropdown overflow-hidden flex flex-col'
+          >
+            <div className='p-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--subtle))]'>
+              <input
+                type='text'
+                placeholder='Cari...'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className='w-full px-3 py-1.5 text-sm bg-[hsl(var(--surface))] border border-[hsl(var(--input))] rounded-[calc(var(--radius)-4px)] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]/20 focus:border-[hsl(var(--ring))] transition-all'
+                onClick={(e) => e.stopPropagation()}
+                autoFocus
+              />
+            </div>
+            <ul className='max-h-60 overflow-y-auto custom-scrollbar p-1 flex-1' role='listbox'>
+              {filteredOptions.length === 0 ? (
+                <li className='px-3 py-4 text-sm text-muted-foreground text-center cursor-default'>Tidak ada hasil</li>
+              ) : (
+                filteredOptions.map((option, index) => {
+                  const isSelected = internalValue.includes(option.value)
+                  const isActive = activeIndex === index
+                  return (
+                    <li
+                      key={option.value}
+                      role='option'
+                      aria-selected={isSelected}
+                      aria-current={isActive ? 'true' : undefined}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={() => handleSelect(option.value)}
+                      className={`flex items-center justify-between px-3 py-2 my-0.5 text-sm rounded-[calc(var(--radius)-4px)] cursor-pointer transition-colors duration-150
+                        ${
+                          isSelected
+                            ? 'bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary-soft-foreground))] font-medium'
+                            : isActive
+                              ? 'bg-[hsl(var(--muted))] text-foreground font-medium ring-1 ring-[hsl(var(--ring))]/30'
+                              : 'text-[hsl(var(--popover-foreground))] hover:bg-[hsl(var(--muted))] hover:text-foreground'
+                        }
+                      `}
+                    >
+                      <span className='truncate'>{option.label}</span>
+                      {isSelected && <Check className='shrink-0 w-4 h-4 text-primary ml-2' />}
+                    </li>
+                  )
+                })
+              )}
+            </ul>
+          </div>
+        </PopoverCalculator>
       </div>
 
       {error && <p className='mt-1.5 text-sm text-[hsl(var(--danger))] animate-dropdown'>{error}</p>}

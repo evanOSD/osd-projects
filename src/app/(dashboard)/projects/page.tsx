@@ -175,18 +175,40 @@ export default function ProjectsCatalogPage() {
       color = 'stroke-[hsl(var(--warning))] text-[hsl(var(--warning))]'
     }
 
+    // Hitung selisih presisi tahun, bulan, hari
+    let years = end.getFullYear() - now.getFullYear()
+    let months = end.getMonth() - now.getMonth()
+    let days = end.getDate() - now.getDate()
+
+    if (days < 0) {
+      months -= 1
+      const prevMonth = new Date(end.getFullYear(), end.getMonth(), 0)
+      days += prevMonth.getDate()
+    }
+
+    if (months < 0) {
+      years -= 1
+      months += 12
+    }
+
+    const parts = []
+    if (years > 0) parts.push(`${years} tahun`)
+    if (months > 0) parts.push(`${months} bulan`)
+    if (days > 0 || parts.length === 0) parts.push(`${days} hari`)
+    const label = parts.join(', ')
+
     return {
       daysRemaining,
       percentage,
       color,
-      label: `${daysRemaining} hari`
+      label
     }
   }
 
-  // Aksi navigasi ke plan-progress
-  const handleViewDashboard = (projectName: string) => {
+  // Aksi navigasi ke dashboard proyek
+  const handleViewDashboard = (projectName: string, shortId: string) => {
     setSelectedProject(projectName)
-    router.push('/plan-progress')
+    router.push(`/projects/${shortId}/info`)
   }
 
   return (
@@ -336,7 +358,7 @@ export default function ProjectsCatalogPage() {
                           <Button 
                             variant='ghost-primary' 
                             className='text-xl font-bold text-[hsl(var(--foreground))] tracking-tight px-0 hover:bg-transparent h-auto'
-                            onClick={() => handleViewDashboard(project.project_name)}
+                            onClick={() => handleViewDashboard(project.project_name, project.short_id)}
                           >
                             {project.project_name}
                           </Button>
@@ -366,7 +388,7 @@ export default function ProjectsCatalogPage() {
                           <Users className='w-4 h-4 text-muted-foreground shrink-0 mt-0.5' />
                           <div>
                             <span className='block font-semibold text-muted-foreground'>Project Manager</span>
-                            <span className='text-[hsl(var(--foreground))]'>{project.project_managers?.map(pm => pm.users?.user_name).filter(Boolean).join(', ') || '-'}</span>
+                            <span className='text-[hsl(var(--foreground))]'>{project.project_members?.filter(pm => pm.role === 'project_manager').map(pm => pm.users?.user_name).filter(Boolean).join(', ') || '-'}</span>
                           </div>
                         </div>
 
@@ -444,7 +466,9 @@ export default function ProjectsCatalogPage() {
                               : '-'}
                           </span>
                           <span className='block text-[10px] text-muted-foreground mt-0.5 leading-none'>
-                            {timeInfo.label}
+                            {timeInfo.daysRemaining !== null
+                              ? timeInfo.label
+                              : 'Tenggat tidak diatur'}
                           </span>
                         </div>
 

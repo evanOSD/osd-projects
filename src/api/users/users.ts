@@ -134,5 +134,15 @@ export const usersApi = {
       }
     })
     return Array.from(uniqueValues)
+  },
+
+  getAllUsers: async () => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, user_name')
+      .order('user_name', { ascending: true })
+    if (error) throw new Error(error.message)
+    return data
   }
 }

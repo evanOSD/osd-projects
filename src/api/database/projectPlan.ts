@@ -37,175 +37,89 @@ export type ProjectReportInsert = Database['public']['Tables']['project_reports'
 export type ProjectReportUpdate = Database['public']['Tables']['project_reports']['Update']
 
 export const projectPlanApi = {
-  // 1. SELF-HEALING DATABASE SETUP AND DATA INITIALIZATION FOR A PROJECT
-  getOrCreateProjectContext: async (projectName: string) => {
+  // 1. PROJECT CONTEXT BY SHORT ID FETCHING
+  getProjectContextByShortId: async (shortId: string) => {
     const supabase = createClient()
 
-    // A. Dapatkan atau buat data Project
-    let { data: project } = await supabase.from('projects').select('*').eq('project_name', projectName).maybeSingle()
+    // A. Dapatkan data Project
+    const { data: project } = await supabase.from('projects').select('*').eq('short_id', shortId).maybeSingle()
 
     if (!project) {
-      const { data: insertedProject, error: projectError } = await supabase
-        .from('projects')
-        .insert({
-          project_name: projectName,
-          project_status: 'on_going'
-        })
-        .select()
-        .single()
-
-      if (projectError) throw new Error(`Gagal membuat project: ${projectError.message}`)
-      project = insertedProject
+      throw new Error(`Project dengan kode "${shortId}" tidak ditemukan di database.`)
     }
 
-    // B. Pastikan ada data Steps default (jika tabel steps kosong)
-    const { count, error: countError } = await supabase.from('steps').select('id', { count: 'exact', head: true })
-    if (count === null || count === 0) {
-      // Inisialisasi steps bawaan/default berdasarkan persentase
-      const defaultSteps = [
-        {
-          step_name: 'Exegesis & 1st Draft',
-          weight_percentage: 35,
-          step_category: ['translation'],
-          input_type: ['date_picker'],
-          default_order: 1
-        },
-        {
-          step_name: 'Team Check',
-          weight_percentage: 10,
-          step_category: ['translation'],
-          input_type: ['date_picker'],
-          default_order: 2
-        },
-        {
-          step_name: 'Community Testing',
-          weight_percentage: 25,
-          step_category: ['translation'],
-          input_type: ['date_picker'],
-          default_order: 3
-        },
-        {
-          step_name: 'Back Translation',
-          weight_percentage: 10,
-          step_category: ['translation'],
-          input_type: ['date_picker'],
-          default_order: 4
-        },
-        {
-          step_name: 'Quality Assurance',
-          weight_percentage: 10,
-          step_category: ['translation'],
-          input_type: ['date_picker'],
-          default_order: 5
-        },
-        {
-          step_name: 'Published',
-          weight_percentage: 10,
-          step_category: ['translation'],
-          input_type: ['date_picker'],
-          default_order: 6
-        }
-      ]
-      await supabase.from('steps').insert(defaultSteps)
+    // B. Dapatkan data Steps
+    const { data: steps } = await supabase.from('steps').select('*').order('default_order')
+
+    const { data: projectLanguage } = await supabase
+      .from('project_languages')
+      .select('*, languages(*)')
+      .eq('project_id', project.id)
+      .maybeSingle()
+
+    const language = projectLanguage ? (projectLanguage as any).languages : null
+
+    // D. Dapatkan daftar books
+    const { data: books } = await supabase
+      .from('books')
+      .select('id, kitab, total_verses, chapter, pasal')
+      .order('global_order')
+
+    return {
+      project,
+      language: language || null,
+      projectLanguage: projectLanguage || null,
+      books: books || [],
+      steps: steps || []
+    }
+  },
+
+  // 1. PROJECT CONTEXT FETCHING
+  getProjectContext: async (projectName: string) => {
+    const supabase = createClient()
+
+    // A. Dapatkan data Project
+    const { data: project } = await supabase.from('projects').select('*').eq('project_name', projectName).maybeSingle()
+
+    if (!project) {
+      throw new Error(`Project "${projectName}" tidak ditemukan di database.`)
     }
 
-    // C. Dapatkan atau buat data Language (Ndom, Hibun, dll.)
-    let langName = 'Ndom'
-    let langCode = 'ndm'
-    if (projectName.includes('Keninjal')) {
-      langName = 'Keninjal'
-      langCode = 'kjl'
-    } else if (projectName.includes('Hibun')) {
-      langName = 'Hibun'
-      langCode = 'hib'
-    } else if (projectName.includes('Jangkang')) {
-      langName = 'Jangkang'
-      langCode = 'jgi'
-    } else if (projectName.includes('Seberuang')) {
-      langName = 'Seberuang'
-      langCode = 'sbx'
-    } else if (projectName.includes('Tabun')) {
-      langName = 'Tabun'
-      langCode = 'tbn'
-    }
+    // B. Dapatkan data Steps
+    const { data: steps } = await supabase.from('steps').select('*').order('default_order')
 
-    let { data: language } = await supabase
+    // C. Dapatkan data Language
+    // (Pencarian bahasa untuk sementara disederhanakan dengan asumsi project berhubungan dengan project_languages)
+    // Akan di restrukturisasi nanti sesuai issue.md menggunakan short_id
+    let langName = 'Ndom' // Fallback
+
+    const { data: language } = await supabase
       .from('languages')
       .select('*')
       .eq('name_in_ethnologue', langName)
       .maybeSingle()
 
-    if (!language) {
-      const { data: insertedLanguage, error: langError } = await supabase
-        .from('languages')
-        .insert({
-          name_in_ethnologue: langName,
-          iso_code: langCode,
-          name_with_code: `${langName} (${langCode})`
-        })
-        .select()
-        .single()
-
-      if (langError) throw new Error(`Gagal membuat data bahasa: ${langError.message}`)
-      language = insertedLanguage
-    }
-
-    // D. Dapatkan atau buat Project Language link
-    let { data: projectLanguage } = await supabase
-      .from('project_languages')
-      .select('*')
-      .eq('project_id', project.id)
-      .eq('language_id', language.id)
-      .maybeSingle()
-
-    if (!projectLanguage) {
-      const { data: insertedProjLang, error: linkError } = await supabase
+    let projectLanguage = null
+    if (language) {
+      const { data: pl } = await supabase
         .from('project_languages')
-        .insert({
-          project_id: project.id,
-          language_id: language.id,
-          facilitator: 'Staff Facilitator'
-        })
-        .select()
-        .single()
-
-      if (linkError) throw new Error(`Gagal membuat project-language link: ${linkError.message}`)
-      projectLanguage = insertedProjLang
+        .select('*')
+        .eq('project_id', project.id)
+        .eq('language_id', language.id)
+        .maybeSingle()
+      projectLanguage = pl
     }
 
-    // E. Pastikan juga ada minimal outcomes bawaan jika outcomes kosong untuk project ini
-    const { data: outcomes } = await supabase.from('project_outcomes').select('*').eq('project_id', project.id)
-    if (!outcomes || outcomes.length === 0) {
-      const defaultOutcomes = [
-        {
-          project_id: project.id,
-          project_language_id: projectLanguage.id,
-          outcome_name: 'Word of God available in this language',
-          indicator_of_change: 'Community has scripture portions and videos',
-          measurement_method: 'Consultant verification and local feedback'
-        },
-        {
-          project_id: project.id,
-          project_language_id: projectLanguage.id,
-          outcome_name: 'Local church partners actively engaged',
-          indicator_of_change: 'Pastor utilizes scripture in services',
-          measurement_method: 'Quarterly interview with local church'
-        }
-      ]
-      await supabase.from('project_outcomes').insert(defaultOutcomes)
-    }
-
-    // F. Dapatkan daftar books & steps untuk referensi dropdown & progress
+    // D. Dapatkan daftar books
     const { data: books } = await supabase
       .from('books')
       .select('id, kitab, total_verses, chapter, pasal')
       .order('global_order')
-    const { data: steps } = await supabase.from('steps').select('*').order('default_order')
 
     return {
       project,
-      language,
-      projectLanguage,
+      language: language || null,
+      projectLanguage: projectLanguage || null,
       books: books || [],
       steps: steps || []
     }

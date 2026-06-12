@@ -16,6 +16,14 @@ export function useLanguages(filters: Record<string, string[]> = {}, sorting: an
   })
 }
 
+export function useAllLanguagesList() {
+  return useQuery({
+    queryKey: ['languagesList'],
+    queryFn: () => languagesApi.getAllLanguages(),
+    staleTime: 1000 * 60 * 10 // Cache for 10 minutes
+  })
+}
+
 export function useLanguageFilterOptions(columnName: keyof LanguageRow, enabled: boolean = true) {
   return useQuery({
     queryKey: ['languages', 'filterOptions', columnName],

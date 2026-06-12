@@ -63,3 +63,11 @@ export function useDeleteUsers() {
     }
   })
 }
+
+export function useAllUsersList() {
+  return useQuery({
+    queryKey: ['usersList'],
+    queryFn: () => usersApi.getAllUsers(),
+    staleTime: 1000 * 60 * 10
+  })
+}

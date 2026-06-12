@@ -20,10 +20,19 @@ import {
 } from '@/api/database/projectPlan'
 
 // 1. PROJECT CONTEXT HOOK
+export function useProjectContextByShortId(shortId: string) {
+  return useQuery({
+    queryKey: ['projectContextByShortId', shortId],
+    queryFn: () => projectPlanApi.getProjectContextByShortId(shortId),
+    enabled: !!shortId,
+    staleTime: 1000 * 60 * 10 // Cache for 10 minutes
+  })
+}
+
 export function useProjectContext(projectName: string) {
   return useQuery({
     queryKey: ['projectContext', projectName],
-    queryFn: () => projectPlanApi.getOrCreateProjectContext(projectName),
+    queryFn: () => projectPlanApi.getProjectContext(projectName),
     enabled: !!projectName,
     staleTime: 1000 * 60 * 10 // Cache for 10 minutes
   })

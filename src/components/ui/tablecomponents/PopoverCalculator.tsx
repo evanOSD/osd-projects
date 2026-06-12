@@ -11,12 +11,20 @@ interface PopoverCalculatorProps {
   triggerRef: React.RefObject<HTMLElement | null>
   children: React.ReactNode
   className?: string
+  matchTriggerWidth?: boolean
 }
 
-export function PopoverCalculator({ isOpen, onClose, triggerRef, children, className = '' }: PopoverCalculatorProps) {
+export function PopoverCalculator({
+  isOpen,
+  onClose,
+  triggerRef,
+  children,
+  className = '',
+  matchTriggerWidth = false
+}: PopoverCalculatorProps) {
   const [mounted, setMounted] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
-  const [coords, setCoords] = useState({ top: -9999, left: -9999 })
+  const [coords, setCoords] = useState<{ top: number; left: number; width?: number }>({ top: -9999, left: -9999 })
 
   useEffect(() => setMounted(true), [])
 
@@ -36,7 +44,10 @@ export function PopoverCalculator({ isOpen, onClose, triggerRef, children, class
       let left = trigger.left
 
       // Deteksi tabrakan bawah (Jika mentok layar bawah, buka ke atas)
-      if (top + popover.height > vh) top = trigger.top - popover.height - 4
+      if (top + popover.height > vh) {
+        top = trigger.top - popover.height - 4
+        if (top < 8) top = 8 // Cegah terpotong di atas
+      }
 
       // Deteksi tabrakan kanan (Geser ke kiri agar tidak terpotong)
       if (left + popover.width > vw) left = vw - popover.width - 8
@@ -44,7 +55,7 @@ export function PopoverCalculator({ isOpen, onClose, triggerRef, children, class
       // Deteksi tabrakan kiri
       if (left < 0) left = 8
 
-      setCoords({ top, left })
+      setCoords({ top, left, width: matchTriggerWidth ? trigger.width : undefined })
     }
 
     updatePosition()
@@ -56,7 +67,7 @@ export function PopoverCalculator({ isOpen, onClose, triggerRef, children, class
       window.removeEventListener('scroll', updatePosition, true)
       window.removeEventListener('resize', updatePosition)
     }
-  }, [isOpen, children])
+  }, [isOpen, children, matchTriggerWidth, triggerRef])
 
   useEffect(() => {
     if (!isOpen) return
@@ -79,7 +90,12 @@ export function PopoverCalculator({ isOpen, onClose, triggerRef, children, class
   return createPortal(
     <div
       ref={popoverRef}
-      style={{ top: coords.top, left: coords.left, position: 'fixed' }}
+      style={{
+        top: coords.top,
+        left: coords.left,
+        position: 'fixed',
+        width: coords.width !== undefined ? `${coords.width}px` : undefined
+      }}
       className={`z-100 ${className}`}
       onMouseDown={e => e.stopPropagation()}
     >
