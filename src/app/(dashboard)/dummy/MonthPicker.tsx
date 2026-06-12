@@ -56,7 +56,6 @@ export const MonthPicker = ({
   const buttonRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Mengkalkulasi posisi popover kalender secara dinamis
   const updateDropdownPosition = useCallback(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
@@ -205,9 +204,7 @@ export const MonthPicker = ({
           <div className='grid grid-cols-3 gap-1.5'>
             {MONTHS_ID.map((monthName, index) => {
               const isSelected =
-                internalValue &&
-                internalValue.getMonth() === index &&
-                internalValue.getFullYear() === currentYear
+                internalValue && internalValue.getMonth() === index && internalValue.getFullYear() === currentYear
 
               return (
                 <Button

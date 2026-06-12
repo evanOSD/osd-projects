@@ -37,21 +37,6 @@ export const storyColumns: ColumnDef<StoryRow>[] = [
     fetchFilterOptions: fetchStoriesFilter('story_category')
   }),
   createStandardColumn<StoryRow>({
-    id: 'book_category',
-    header: 'Kategori Kitab',
-    dataType: 'text',
-    dropdownOptions: ['Old Testament', 'New Testament'],
-    size: 220,
-    fetchFilterOptions: fetchStoriesFilter('book_category')
-  }),
-  createStandardColumn<StoryRow>({
-    id: 'book_ref_order',
-    header: 'Book Ref Order',
-    dataType: 'text',
-    size: 220,
-    fetchFilterOptions: fetchStoriesFilter('book_ref_order')
-  }),
-  createStandardColumn<StoryRow>({
     id: 'judul_cerita',
     header: 'Judul Cerita',
     dataType: 'text',

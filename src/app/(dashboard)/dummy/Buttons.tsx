@@ -1,3 +1,5 @@
+// src/app/(dashboard)/dummy/Buttons.tsx
+
 import React from 'react'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

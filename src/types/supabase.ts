@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -400,6 +400,42 @@ export type Database = {
           },
         ]
       }
+      project_managers: {
+        Row: {
+          created_at: string | null
+          id: string
+          project_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          project_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          project_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_managers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_managers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_non_translation_goals: {
         Row: {
           achievement_indicator: string | null
@@ -780,6 +816,9 @@ export type Database = {
           project_status:
             | Database["public"]["Enums"]["completion_status"]
             | null
+          project_type: Database["public"]["Enums"]["project_type"] | null
+          sensitivity: Database["public"]["Enums"]["project_sensitivity"] | null
+          organization_id: string | null
         }
         Insert: {
           cluster_leader?: string | null
@@ -793,6 +832,9 @@ export type Database = {
           project_status?:
             | Database["public"]["Enums"]["completion_status"]
             | null
+          project_type?: Database["public"]["Enums"]["project_type"] | null
+          sensitivity?: Database["public"]["Enums"]["project_sensitivity"] | null
+          organization_id?: string | null
         }
         Update: {
           cluster_leader?: string | null
@@ -806,8 +848,19 @@ export type Database = {
           project_status?:
             | Database["public"]["Enums"]["completion_status"]
             | null
+          project_type?: Database["public"]["Enums"]["project_type"] | null
+          sensitivity?: Database["public"]["Enums"]["project_sensitivity"] | null
+          organization_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "projects_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       steps: {
         Row: {
@@ -1021,7 +1074,8 @@ export type Database = {
     Enums: {
       completion_status: "not_started" | "on_going" | "completed"
       measurement_type: "outcome" | "goal" | "activity"
-      project_type: "story" | "passage" | "book"
+      project_sensitivity: "Level 1 - Low" | "Level 2 - Medium" | "Level 3 - High"
+      project_type: "story" | "passage" | "book" | "Oral Bible Stories" | "Oral Bible Translation"
       step_category: "administration" | "finance" | "translation"
       step_input_type:
         | "date_picker"
@@ -1161,7 +1215,8 @@ export const Constants = {
     Enums: {
       completion_status: ["not_started", "on_going", "completed"],
       measurement_type: ["outcome", "goal", "activity"],
-      project_type: ["story", "passage", "book"],
+      project_sensitivity: ["Level 1 - Low", "Level 2 - Medium", "Level 3 - High"],
+      project_type: ["story", "passage", "book", "Oral Bible Stories", "Oral Bible Translation"],
       step_category: ["administration", "finance", "translation"],
       step_input_type: [
         "date_picker",
