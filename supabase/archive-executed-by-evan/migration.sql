@@ -20,23 +20,23 @@ ALTER TABLE project_members ENABLE ROW LEVEL SECURITY;
 
 -- 4. Buat RLS Policies
 -- Kebijakan Membaca (Read) - Semua user terautentikasi dapat membaca anggota proyek
-CREATE POLICY "Enable read access for authenticated users" 
-ON project_members 
-FOR SELECT 
-TO authenticated 
+CREATE POLICY "Enable read access for authenticated users"
+ON project_members
+FOR SELECT
+TO authenticated
 USING (true);
 
 -- Kebijakan Menulis (Insert/Update/Delete) - Semua user terautentikasi dapat mengelola anggota proyek
-CREATE POLICY "Enable write access for authenticated users" 
-ON project_members 
-FOR ALL 
-TO authenticated 
-USING (true) 
+CREATE POLICY "Enable write access for authenticated users"
+ON project_members
+FOR ALL
+TO authenticated
+USING (true)
 WITH CHECK (true);
 
 -- 5. Migrasi Data dari tabel lama `project_managers` ke `project_members`
 INSERT INTO project_members (project_id, user_id, role)
-SELECT project_id, user_id, 'project_manager'::project_role 
+SELECT project_id, user_id, 'project_manager'::project_role
 FROM project_managers
 ON CONFLICT (project_id, user_id, role) DO NOTHING;
 
