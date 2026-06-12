@@ -122,8 +122,8 @@ export default function ProjectInfoPage() {
     )
   ).map(lang => capitalize(lang as string)).join(', ') || 'Belum Diatur'
 
-  const teamSize = project.project_languages?.reduce((sum: number, lang: any) => {
-    return sum + (lang.project_yearly_capacity?.reduce((lSum: number, cap: any) => lSum + (cap.num_translators || 0), 0) || 0)
+  const teamSize = project.project_plans?.reduce((sum: number, plan: any) => {
+    return sum + (plan.number_of_translators || 0)
   }, 0) || 0
 
   const translationGoalsCount = project.project_languages?.reduce(

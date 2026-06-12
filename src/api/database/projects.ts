@@ -13,8 +13,8 @@ export type ProjectWithRelations = ProjectRow & {
   project_languages: (Database['public']['Tables']['project_languages']['Row'] & {
     languages: { name_in_ethnologue: string | null } | null
     project_translation_goals: { id: string }[]
-    project_yearly_capacity: { num_translators: number }[]
   })[]
+  project_plans: { number_of_translators: number; fiscal_year: number }[]
   project_outcomes: { id: string }[]
 }
 
@@ -42,10 +42,11 @@ export const projectsApi = {
           ),
           project_translation_goals (
             id
-          ),
-          project_yearly_capacity (
-            num_translators
           )
+        ),
+        project_plans (
+          number_of_translators,
+          fiscal_year
         ),
         project_outcomes (
           id
@@ -80,10 +81,11 @@ export const projectsApi = {
           ),
           project_translation_goals (
             id
-          ),
-          project_yearly_capacity (
-            num_translators
           )
+        ),
+        project_plans (
+          number_of_translators,
+          fiscal_year
         ),
         project_outcomes (
           id

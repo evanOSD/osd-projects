@@ -7,9 +7,21 @@ export type ProjectRow = Database['public']['Tables']['projects']['Row']
 export type LanguageRow = Database['public']['Tables']['languages']['Row']
 export type ProjectLanguageRow = Database['public']['Tables']['project_languages']['Row']
 
-export type YearlyCapacityRow = Database['public']['Tables']['project_yearly_capacity']['Row']
-export type YearlyCapacityInsert = Database['public']['Tables']['project_yearly_capacity']['Insert']
-export type YearlyCapacityUpdate = Database['public']['Tables']['project_yearly_capacity']['Update']
+export type ProjectPlanRow = Database['public']['Tables']['project_plans']['Row']
+export type ProjectPlanInsert = Database['public']['Tables']['project_plans']['Insert']
+export type ProjectPlanUpdate = Database['public']['Tables']['project_plans']['Update']
+
+export type PlanningStageRow = Database['public']['Tables']['project_planning_stages']['Row']
+export type PlanningStageInsert = Database['public']['Tables']['project_planning_stages']['Insert']
+export type PlanningStageUpdate = Database['public']['Tables']['project_planning_stages']['Update']
+
+export type FiscalBreakdownRow = Database['public']['Tables']['project_fiscal_breakdowns']['Row']
+export type FiscalBreakdownInsert = Database['public']['Tables']['project_fiscal_breakdowns']['Insert']
+export type FiscalBreakdownUpdate = Database['public']['Tables']['project_fiscal_breakdowns']['Update']
+
+export type ScheduleRow = Database['public']['Tables']['project_schedules']['Row']
+export type ScheduleInsert = Database['public']['Tables']['project_schedules']['Insert']
+export type ScheduleUpdate = Database['public']['Tables']['project_schedules']['Update']
 
 export type OutcomeRow = Database['public']['Tables']['project_outcomes']['Row']
 export type OutcomeInsert = Database['public']['Tables']['project_outcomes']['Insert']
@@ -62,7 +74,7 @@ export const projectPlanApi = {
     // D. Dapatkan daftar books
     const { data: books } = await supabase
       .from('books')
-      .select('id, kitab, total_verses, chapter, pasal')
+      .select('id, kitab, total_verses, chapter, pasal, category, book')
       .order('global_order')
 
     return {
@@ -113,8 +125,10 @@ export const projectPlanApi = {
     // D. Dapatkan daftar books
     const { data: books } = await supabase
       .from('books')
-      .select('id, kitab, total_verses, chapter, pasal')
+      .select('id, kitab, total_verses, chapter, pasal, category, book')
       .order('global_order')
+      
+    console.log('DEBUG BOOKS FROM DB:', books?.slice(0, 2))
 
     return {
       project,
@@ -125,42 +139,118 @@ export const projectPlanApi = {
     }
   },
 
-  // 2. YEARLY CAPACITY APIS
-  getYearlyCapacity: async (projectLanguageId: string) => {
+  // 2. PROJECT PLAN APIS
+  getProjectPlans: async (projectId: string) => {
     const supabase = createClient()
     const { data, error } = await supabase
-      .from('project_yearly_capacity')
-      .select('*')
-      .eq('project_language_id', projectLanguageId)
+      .from('project_plans')
+      .select(
+        `
+        *,
+        project_schedules(*),
+        project_fiscal_breakdowns(*)
+      `
+      )
+      .eq('project_id', projectId)
       .order('fiscal_year', { ascending: true })
     if (error) throw new Error(error.message)
-    return data as YearlyCapacityRow[]
+    return data as unknown as (ProjectPlanRow & {
+      project_schedules: ScheduleRow[]
+      project_fiscal_breakdowns: FiscalBreakdownRow[]
+    })[]
   },
 
-  addYearlyCapacity: async (payload: YearlyCapacityInsert) => {
+  addProjectPlan: async (payload: ProjectPlanInsert) => {
     const supabase = createClient()
-    const { data, error } = await supabase.from('project_yearly_capacity').insert(payload).select().single()
+    const { data, error } = await supabase.from('project_plans').insert(payload).select().single()
     if (error) throw new Error(error.message)
-    return data as YearlyCapacityRow
+    return data as ProjectPlanRow
   },
 
-  updateYearlyCapacity: async (id: string, payload: YearlyCapacityUpdate) => {
+  updateProjectPlan: async (id: string, payload: ProjectPlanUpdate) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from('project_plans').update(payload).eq('id', id).select().single()
+    if (error) throw new Error(error.message)
+    return data as ProjectPlanRow
+  },
+
+  deleteProjectPlan: async (id: string) => {
+    const supabase = createClient()
+    const { error } = await supabase.from('project_plans').delete().eq('id', id)
+    if (error) throw new Error(error.message)
+    return true
+  },
+
+  // PLANNING STAGES APIS
+  getPlanningStages: async (translationGoalId: string) => {
     const supabase = createClient()
     const { data, error } = await supabase
-      .from('project_yearly_capacity')
+      .from('project_planning_stages')
+      .select('*, steps(*)')
+      .eq('translation_goal_id', translationGoalId)
+    if (error) throw new Error(error.message)
+    return data as (PlanningStageRow & { steps: StepRow | null })[]
+  },
+
+  addPlanningStage: async (payload: PlanningStageInsert) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from('project_planning_stages').insert(payload).select().single()
+    if (error) throw new Error(error.message)
+    return data as PlanningStageRow
+  },
+
+  updatePlanningStage: async (id: string, payload: PlanningStageUpdate) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('project_planning_stages')
       .update(payload)
       .eq('id', id)
       .select()
       .single()
     if (error) throw new Error(error.message)
-    return data as YearlyCapacityRow
+    return data as PlanningStageRow
   },
 
-  deleteYearlyCapacity: async (id: string) => {
+  deletePlanningStage: async (id: string) => {
     const supabase = createClient()
-    const { error } = await supabase.from('project_yearly_capacity').delete().eq('id', id)
+    const { error } = await supabase.from('project_planning_stages').delete().eq('id', id)
     if (error) throw new Error(error.message)
     return true
+  },
+
+  // SCHEDULES APIS
+  addSchedule: async (payload: ScheduleInsert) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from('project_schedules').insert(payload).select().single()
+    if (error) throw new Error(error.message)
+    return data as ScheduleRow
+  },
+
+  updateSchedule: async (id: string, payload: ScheduleUpdate) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from('project_schedules').update(payload).eq('id', id).select().single()
+    if (error) throw new Error(error.message)
+    return data as ScheduleRow
+  },
+
+  // FISCAL BREAKDOWNS APIS
+  addFiscalBreakdown: async (payload: FiscalBreakdownInsert) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from('project_fiscal_breakdowns').insert(payload).select().single()
+    if (error) throw new Error(error.message)
+    return data as FiscalBreakdownRow
+  },
+
+  updateFiscalBreakdown: async (id: string, payload: FiscalBreakdownUpdate) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('project_fiscal_breakdowns')
+      .update(payload)
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) throw new Error(error.message)
+    return data as FiscalBreakdownRow
   },
 
   // 3. OUTCOMES APIS
@@ -232,15 +322,17 @@ export const projectPlanApi = {
   // 5. TRANSLATION GOALS APIS & AUTO-INITIALIZATION OF PROGRESS
   getTranslationGoals: async (projectLanguageId: string) => {
     const supabase = createClient()
-    // Ambil goal terjemahan dengan relasi ke book dan progress langkah
+    // Ambil goal terjemahan dengan relasi ke book, passages, stories, dan progress langkah
     const { data: goals, error } = await supabase
       .from('project_translation_goals')
-      .select('*, books(*), project_translation_progress(*)')
+      .select('*, books(*), passages(*), stories(*), project_translation_progress(*)')
       .eq('project_language_id', projectLanguageId)
     if (error) throw new Error(error.message)
 
     return goals as (TranslationGoalRow & {
       books: any | null
+      passages: any | null
+      stories: any | null
       project_translation_progress: TranslationProgressRow[]
     })[]
   },

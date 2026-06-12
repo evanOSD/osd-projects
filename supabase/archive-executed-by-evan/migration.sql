@@ -1,5 +1,5 @@
 -- ==========================================
--- MIGRATION: RESTRIKTURISASI PROJECT MEMBERS
+-- MIGRATION: RESTRUKTURISASI PROJECT MEMBERS
 -- ==========================================
 
 -- 1. Buat tipe Enum baru untuk peran proyek
@@ -19,14 +19,14 @@ CREATE TABLE project_members (
 ALTER TABLE project_members ENABLE ROW LEVEL SECURITY;
 
 -- 4. Buat RLS Policies
--- Kebijakan Membaca (Read) - Semua user terautentikasi dapat membaca anggota proyek
+-- Kebijakan Membaca (Read) - Semua user authenticated dapat membaca anggota proyek
 CREATE POLICY "Enable read access for authenticated users"
 ON project_members
 FOR SELECT
 TO authenticated
 USING (true);
 
--- Kebijakan Menulis (Insert/Update/Delete) - Semua user terautentikasi dapat mengelola anggota proyek
+-- Kebijakan Menulis (Insert/Update/Delete) - Semua user authenticated dapat mengelola anggota proyek
 CREATE POLICY "Enable write access for authenticated users"
 ON project_members
 FOR ALL

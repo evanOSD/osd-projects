@@ -441,8 +441,8 @@ export default function ProjectsCatalogPage() {
                           <div>
                             <span className='block font-semibold text-muted-foreground'>Team Size</span>
                             <span className='text-[hsl(var(--foreground))]'>
-                              {project.project_languages?.reduce((sum, lang) => {
-                                return sum + (lang.project_yearly_capacity?.reduce((lSum, cap) => lSum + (cap.num_translators || 0), 0) || 0)
+                              {project.project_plans?.reduce((sum, plan) => {
+                                return sum + (plan.number_of_translators || 0)
                               }, 0) || '0'} Orang
                             </span>
                           </div>

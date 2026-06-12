@@ -1,11 +1,17 @@
 buatkan issue.md yang berisi perencanaan untuk nanti diimplementasikan oleh junior programmer atau ai model yang lebih murah.
 isi dari planning-nya adalah sebagai berikut:
 
-sekarang saya ingin kamu cek dan memberitahu saya apakah Field Coordinator dan Cluster Leader di halaman project info ini perlu dibuatkan pivot tabel juga seperti tabel project_managers atau tidak?
-berikan alasannya
-sebagai konteks, dalam penerjemahan Alkitab, Project Manager biasanya setara dengan Field Coordinator, sedangkan Cluster Leader berada di bawah Field Coordinator, lalu Fasilitator Bahasa berada di bawah Cluster Leader.
-Coba bantu cek schema saya secara keseluruhan apakah schema saya yang sekarang mendukung untuk hierarki seperti yang saya atau tidak?
-saya ingin diskusi dulu dengan cara kamu membuatkan tahapan tahapan, beserta alasan, konsekuensi, kelebihan dan kekurangan pendekatan schema sekarang dibandingkan dengan usulanmu
+Tujuannya adalah mengidentifikasi kebutuhan field sesuai yang diharapkan oleh desain halaman project plan. Maka dari itu perlu adanya analisa dan membedah schema dan tabel yang ada sekarang supaya sesuai dengan kebutuhan yang lebih scalable di masa depan.
+
+1. Plan adalah daftar rincian teknis dalam project penerjemahan alkitab. Plan biasanya terkait dengan nama suku bahasa, target terjemahan, target non-terjemahan, jadwal translation-goals, dan jadwal activities.
+2. Hierarki umum dalam sebuah plan adalah seperti berikut:
+a. Team Information meliputi kolom Fiscal Year, Number of Translators, Team Verses per Day, Work Days per Year. Team information ini hanya berada di dalam Plan saja.
+b. Outcomes meliputi kolom Outcome (Desired Changes), Indicator of Change, How will you measure the desired change?, Year (if applicable)
+c. Output-Goals. Output-Goals meliputi kolom Related Outcome, Project Output Goal, Product Medium, How will we know we have achieve this?, How will you measure the achievement of this goal? Output-Goals ini secara hierarki sudah jelas berada di bawah Outcomes, karena ada field/kolom Related Outcome di dalam Output-Goals
+d. Activities, Activities meliputi kolom Related Output-Goal, Activity, Team Days, Year, Expected Milestones. Activity ini juga sudah jelas berada di bawah Output-Goals, karena ada field Related Output-Goal di dalam Activity. Jadi secara urutan hierarki adalah Outcome, Output-Goals (Non-Translation Goals), kemudian yang terakhir ada Activity
+e. Translation Goals (Book Selection). Karena ini adalah tentang web app project penerjemahan alkitab maka Translation Goals ini menjadi wajib. Di dalamnya ada kolom Book, Chapters, Level of Difficulty, Verses in Book, Verses in Project, dan Notes. Nah nantinya akan perlu pembahasan khusus supaya bisa mengakomodasi hubungan antara tabel books, passages, dan stories. Misalnya jika sebuah project berupa stories, maka keterkaitannya harus jelas untuk setiap field yang ada di Translation Goals. Untuk sekarang kita perlu hadirkan schema apa adanya dulu. Untuk detailnya nanti saja, akan dicek per section.
+f. Planning Stages. Sebenarnya planning stages ini mengambil nilai dropdown dari tabel steps. Kenapa perlu tabel steps supaya jika ada tahapan yang diperlukan lainnya nantinya akan bisa ditambahkan label beserta kegunaan dari tahapan tersebut kaitannya dengan progress dan pelaporan. Di dalam Planning Stages ada kolom Stage Category, Name, Percentage.
+g. Selain itu kita juga harus membuat Fiscal Year Breakdown yang bisa diinput manual maupun otomatis berdasarkan Percentage di planning stages dan team information pada poin 2a. Kita harus membuat fitur Schedule dan Fiscal Breakdown yang terpisah
 
 Buat tahapan-tahapan yang harus dilakukan untuk mengimplementasikan fitur-fitur ini.
 Jelaskan secara detail dengan target junior programmer atau ai model yang lebih murah

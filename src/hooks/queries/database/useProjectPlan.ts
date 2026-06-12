@@ -4,8 +4,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import {
   projectPlanApi,
-  YearlyCapacityInsert,
-  YearlyCapacityUpdate,
+  ProjectPlanInsert,
+  ProjectPlanUpdate,
+  PlanningStageInsert,
+  PlanningStageUpdate,
+  FiscalBreakdownInsert,
+  FiscalBreakdownUpdate,
+  ScheduleInsert,
+  ScheduleUpdate,
   OutcomeInsert,
   OutcomeUpdate,
   NonTranslationGoalInsert,
@@ -22,7 +28,7 @@ import {
 // 1. PROJECT CONTEXT HOOK
 export function useProjectContextByShortId(shortId: string) {
   return useQuery({
-    queryKey: ['projectContextByShortId', shortId],
+    queryKey: ['projectContextByShortId', shortId, 'v2'],
     queryFn: () => projectPlanApi.getProjectContextByShortId(shortId),
     enabled: !!shortId,
     staleTime: 1000 * 60 * 10 // Cache for 10 minutes
@@ -38,22 +44,22 @@ export function useProjectContext(projectName: string) {
   })
 }
 
-// 2. YEARLY CAPACITY HOOKS
-export function useYearlyCapacity(projectLanguageId: string) {
+// 2. PROJECT PLAN HOOKS
+export function useProjectPlans(projectId: string) {
   return useQuery({
-    queryKey: ['yearlyCapacity', projectLanguageId],
-    queryFn: () => projectPlanApi.getYearlyCapacity(projectLanguageId),
-    enabled: !!projectLanguageId
+    queryKey: ['projectPlans', projectId],
+    queryFn: () => projectPlanApi.getProjectPlans(projectId),
+    enabled: !!projectId
   })
 }
 
-export function useAddYearlyCapacity() {
+export function useAddProjectPlan() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (payload: YearlyCapacityInsert) => projectPlanApi.addYearlyCapacity(payload),
+    mutationFn: (payload: ProjectPlanInsert) => projectPlanApi.addProjectPlan(payload),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['yearlyCapacity', data.project_language_id] })
-      toast.success('Kapasitas tim tahun fiskal berhasil ditambahkan!')
+      queryClient.invalidateQueries({ queryKey: ['projectPlans', data.project_id] })
+      toast.success('Rencana proyek (Project Plan) berhasil ditambahkan!')
     },
     onError: (error: any) => {
       toast.error(`Gagal menambahkan: ${error.message}`)
@@ -61,14 +67,14 @@ export function useAddYearlyCapacity() {
   })
 }
 
-export function useUpdateYearlyCapacity() {
+export function useUpdateProjectPlan() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: YearlyCapacityUpdate }) =>
-      projectPlanApi.updateYearlyCapacity(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: ProjectPlanUpdate }) =>
+      projectPlanApi.updateProjectPlan(id, payload),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['yearlyCapacity', data.project_language_id] })
-      toast.success('Kapasitas tim berhasil diperbarui!', { id: 'capacity-update' })
+      queryClient.invalidateQueries({ queryKey: ['projectPlans', data.project_id] })
+      toast.success('Rencana proyek berhasil diperbarui!', { id: 'project-plan-update' })
     },
     onError: (error: any) => {
       toast.error(`Gagal menyimpan: ${error.message}`)
@@ -76,16 +82,124 @@ export function useUpdateYearlyCapacity() {
   })
 }
 
-export function useDeleteYearlyCapacity(projectLanguageId: string) {
+export function useDeleteProjectPlan(projectId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => projectPlanApi.deleteYearlyCapacity(id),
+    mutationFn: (id: string) => projectPlanApi.deleteProjectPlan(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['yearlyCapacity', projectLanguageId] })
-      toast.success('Kapasitas tim tahun fiskal berhasil dihapus!')
+      queryClient.invalidateQueries({ queryKey: ['projectPlans', projectId] })
+      toast.success('Rencana proyek berhasil dihapus!')
     },
     onError: (error: any) => {
       toast.error(`Gagal menghapus: ${error.message}`)
+    }
+  })
+}
+
+// 2b. PLANNING STAGE HOOKS
+export function usePlanningStages(translationGoalId: string) {
+  return useQuery({
+    queryKey: ['planningStages', translationGoalId],
+    queryFn: () => projectPlanApi.getPlanningStages(translationGoalId),
+    enabled: !!translationGoalId
+  })
+}
+
+export function useAddPlanningStage(translationGoalId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: PlanningStageInsert) => projectPlanApi.addPlanningStage(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planningStages', translationGoalId] })
+      toast.success('Tahap perencanaan berhasil ditambahkan!')
+    },
+    onError: (error: any) => {
+      toast.error(`Gagal menambahkan tahap: ${error.message}`)
+    }
+  })
+}
+
+export function useUpdatePlanningStage(translationGoalId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: PlanningStageUpdate }) =>
+      projectPlanApi.updatePlanningStage(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planningStages', translationGoalId] })
+    },
+    onError: (error: any) => {
+      toast.error(`Gagal memperbarui tahap: ${error.message}`)
+    }
+  })
+}
+
+export function useDeletePlanningStage(translationGoalId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => projectPlanApi.deletePlanningStage(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planningStages', translationGoalId] })
+      toast.success('Tahap perencanaan berhasil dihapus!')
+    },
+    onError: (error: any) => {
+      toast.error(`Gagal menghapus tahap: ${error.message}`)
+    }
+  })
+}
+
+// 2c. SCHEDULE HOOKS
+export function useAddSchedule(projectId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: ScheduleInsert) => projectPlanApi.addSchedule(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projectPlans', projectId] })
+      toast.success('Jadwal berhasil ditambahkan!')
+    },
+    onError: (error: any) => {
+      toast.error(`Gagal menambahkan jadwal: ${error.message}`)
+    }
+  })
+}
+
+export function useUpdateSchedule(projectId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: ScheduleUpdate }) =>
+      projectPlanApi.updateSchedule(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projectPlans', projectId] })
+    },
+    onError: (error: any) => {
+      toast.error(`Gagal memperbarui jadwal: ${error.message}`)
+    }
+  })
+}
+
+// 2d. FISCAL BREAKDOWN HOOKS
+export function useAddFiscalBreakdown(projectId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: FiscalBreakdownInsert) => projectPlanApi.addFiscalBreakdown(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projectPlans', projectId] })
+    },
+    onError: (error: any) => {
+      toast.error(`Gagal menyimpan target fiskal: ${error.message}`)
+    }
+  })
+}
+
+export function useUpdateFiscalBreakdown(projectId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: FiscalBreakdownUpdate }) =>
+      projectPlanApi.updateFiscalBreakdown(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projectPlans', projectId] })
+    },
+    onError: (error: any) => {
+      toast.error(`Gagal memperbarui target fiskal: ${error.message}`)
     }
   })
 }
@@ -209,10 +323,10 @@ export function useAddTranslationGoal() {
     mutationFn: (payload: TranslationGoalInsert) => projectPlanApi.addTranslationGoal(payload),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['translationGoals', data.project_language_id] })
-      toast.success('Rencana penerjemahan kitab berhasil ditambahkan!')
+      toast.success('Rencana penerjemahan kitab berhasil ditambahkan!', { id: 'add-translation-success' })
     },
     onError: (error: any) => {
-      toast.error(`Gagal menambahkan: ${error.message}`)
+      toast.error(`Gagal menambahkan: ${error.message}`, { id: 'add-translation-error' })
     }
   })
 }
